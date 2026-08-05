@@ -1,64 +1,122 @@
-# Multi-Agent Architecture
+# Multi-Agent Dispute Resolution Architecture
 
-## Ownership
+## Goals
 
-This repo follows the README split by data domain. Each agent owns a narrow data surface and hands structured evidence to the coordinator/policy layer instead of putting all reasoning in one prompt.
+The system processes `input/EC_001.json` through `EC_050.json`, collects
+verifiable evidence from domain agents, applies `EC_POLICY_V1`, verifies the
+result, and writes one matching JSON file per case. Domain calculations remain
+outside the coordinator.
 
-## Rule 5 Scope: Payment Agent
+## Components And Ownership
 
-Owner module:
+| Component | Owner | Data access | Responsibility |
+| --- | --- | --- | --- |
+| Coordinator Agent | TV1 | Input cases and agent responses | Orchestration, timeout/retry, correlation, trace, and output handoff |
+| Order & Seller Agent | TV2 | orders, order_items, sellers | Order state, items, sellers, totals, and late seller handoff evidence |
+| Payment Agent | TV3 | order_payments | Payment rows, totals, split-payment detection, and reconciliation |
+| Delivery Agent | TV4 | order timestamps plus TV2 handoff | Late/on-time classification and delivery cause candidate |
+| Policy Agent | TV5 | Structured results from TV2-TV4 | Ordered application of `EC_POLICY_V1` |
+| Verifier Agent | TV5 | Draft output and source data when needed | Schema, evidence, ID, money, and limit validation |
+| Output Writer | TV5 | Verified output only | Atomic JSON output creation |
 
-- `agents/payment_agent.py`
-- `services/payment_repository.py`
-- `services/policy_engine.py` for the isolated rule-5 evaluator
-- `shared/schemas.py`, `shared/evidence.py`, `shared/constants.py` for handoff contracts
+The coordinator must not query CSV files or reproduce calculations owned by a
+domain agent. The verifier is the final gate before any output is written.
 
-Data access:
+## Runtime Flow
 
-- Reads only `data/olist_order_payments_dataset.csv`.
-- Receives `item_total_brl` and `freight_total_brl` from Order & Seller Agent.
-- Does not infer refund ledgers, transaction IDs, or missing payment events.
+```mermaid
+sequenceDiagram
+    participant R as run_all.py
+    participant C as Coordinator
+    participant O as OrderSellerAgent
+    participant P as PaymentAgent
+    participant D as DeliveryAgent
+    participant E as PolicyAgent
+    participant V as VerifierAgent
+    participant W as OutputWriter
 
-Handoff payload:
-
-- `payment_rows`
-- `payment_total_brl`
-- `payment_row_count`
-- `payment_ids`
-- `evidence_ids`
-- `has_split_payment`
-- `reconciled_with_order_total`
-- `reconciliation_delta_brl`
-- `valid_split_payment`
-
-Rule 5 condition:
-
-`valid_split_payment = payment_row_count >= 2 and abs(payment_total_brl - (item_total_brl + freight_total_brl)) <= 0.10`
-
-When the policy layer calls rule 5 after rules 1-4, a matched case returns:
-
-- `primary_issue`: `valid_split_payment`
-- `case_status`: `no_action`
-- `root_cause`: `MULTIPLE_PAYMENTS_RECONCILED`
-- `responsible_party`: `none`
-- `recommended_refund_brl`: `0.0`
-- `resolution_actions`: `explain_valid_split_payment`
-
-## Handoff Flow
-
-```text
-Coordinator
-    -> Order & Seller Agent
-        -> item_total_brl, freight_total_brl, item/seller evidence
-    -> Payment Agent
-        -> payment total, payment rows, split-payment reconciliation
-    -> Delivery Agent
-        -> delivery timing and candidate cause
-
-Policy Agent
-    -> applies EC_POLICY_V1 in README priority order
-    -> rule 5 is evaluated only after canceled/unavailable/late-delivery rules
-
-Verifier Agent
-    -> validates schema, evidence ID formats, array limits, money values
+    R->>C: CaseInput
+    C->>O: order_seller.request
+    O-->>C: order_seller.result
+    C->>P: payment.request + order financial totals
+    P-->>C: payment.result
+    C->>D: delivery.request + seller handoff result
+    D-->>C: delivery.result
+    C->>E: policy.request + all domain results
+    E-->>C: policy.result (draft CaseOutput)
+    C->>V: verifier.request + draft CaseOutput
+    V-->>C: verifier.result
+    alt verified
+        C->>W: verified CaseOutput
+    else rejected
+        C-->>R: case error; no output written
+    end
 ```
+
+Payment and delivery are downstream of Order & Seller because both need its
+normalized totals or handoff findings. They may be parallelized later without
+changing the message contracts.
+
+## A2A Contract
+
+All calls implement `AgentPort.handle(A2AMessage) -> A2AMessage` from
+`shared/a2a_messages.py`. Each response must preserve:
+
+- the request `correlation_id`;
+- the input `case_id`;
+- the request ID as `causation_id`;
+- the expected sender, recipient, and response message type.
+
+Payloads are validated using the models in `shared/schemas.py`. Extra fields are
+rejected so contract drift is detected during integration rather than silently
+ignored.
+
+## Agent Construction Contract
+
+`run_all.py` composes teammate-owned classes with these public constructors:
+
+```python
+OrderSellerAgent(data_dir: Path)
+PaymentAgent(data_dir: Path)
+DeliveryAgent(data_dir: Path)
+PolicyAgent()
+VerifierAgent(data_dir: Path)
+OutputWriter(output_dir: Path)
+```
+
+Each agent exposes the correct `AgentName` in its `name` attribute and implements
+`handle`. `OutputWriter.write(CaseOutput)` must write atomically and return only
+after the JSON file is complete.
+
+## Failure And Timeout Behavior
+
+- Every agent call has a configurable timeout, defaulting to 30 seconds.
+- Failed responses are retried only when marked retryable; exceptions and
+  timeouts use the configured retry count.
+- A failed case never receives fabricated domain evidence or an unverified
+  output.
+- The 50-case runner continues with later cases by default and returns a nonzero
+  exit code if any case fails. `--fail-fast` stops on the first error.
+- Response case/order identity is checked to prevent cross-case contamination.
+
+## Trace
+
+`trace.jsonl` is truncated at the start of every run. It contains run, case,
+handoff, timeout/error, and completion events. Each case uses one correlation ID
+through all five agent stages. Test traces are written to temporary directories;
+the root trace is reserved for the latest real run.
+
+## Validation And Submission
+
+```powershell
+python run_all.py --all --validate-only
+python run_all.py --case EC_001
+python run_all.py --all
+pytest -q
+```
+
+The submission archive must select exactly `output/EC_001.json` through
+`output/EC_050.json`. Repository placeholders, source, trace, metadata, and
+secrets must not be included. Models used by agents must have at most 10 billion
+parameters, and the exact model names must be declared in source and recorded in
+`metadata.json`.
