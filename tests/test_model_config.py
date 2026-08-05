@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_qwen_model_is_declared_and_within_parameter_limit() -> None:
-    assert MODEL_NAME == "Qwen/Qwen3-8B"
+    assert MODEL_NAME == "Qwen/Qwen2.5-1.5B-Instruct"
     assert MODEL_PARAMETER_SIZE_BILLION <= 10
 
 

@@ -1,45 +1,67 @@
-"""Integration coverage for the coordinator's official 50-case batch."""
+"""End-to-end coordinator tests over real input cases (LLM disabled).
 
-from __future__ import annotations
-
+Expected values were derived by an independent rule implementation reading the
+raw CSVs directly (no shared code with the pipeline), one case per policy rule.
+"""
 import json
+from pathlib import Path
+
+import pytest
 
 from agents.coordinator_agent import CoordinatorAgent
-from run_all import load_cases
-from shared.trace import TraceWriter
-from tests.fakes import MemoryOutputWriter, build_fake_agents
+from shared.schemas import validate_case_output
+
+ROOT = Path(__file__).resolve().parents[1]
+
+# case_id -> (primary_issue, recommended_refund_brl, payment_total_brl)
+EXPECTED = {
+    "EC_001": ("late_delivery_seller", 12.04, 131.94),
+    "EC_002": ("unsupported_late_claim", 0.0, 180.62),
+    "EC_003": ("canceled_order_paid", 109.34, 109.34),
+    "EC_004": ("valid_split_payment", 0.0, 211.96),
+    "EC_005": ("unavailable_order_paid", 1191.50, 1191.50),
+}
 
 
-def test_all_official_inputs_complete_the_orchestration_flow(tmp_path) -> None:
-    order, payment, delivery, policy, verifier = build_fake_agents()
-    writer = MemoryOutputWriter()
-    coordinator = CoordinatorAgent(
-        order_seller_agent=order,
-        payment_agent=payment,
-        delivery_agent=delivery,
-        policy_agent=policy,
-        verifier_agent=verifier,
-        trace_writer=TraceWriter(tmp_path / "trace.jsonl"),
-        output_writer=writer,
-        timeout_seconds=1,
-        max_retries=0,
-    )
-    try:
-        result = coordinator.run(load_cases("input"))
-    finally:
-        coordinator.close()
+@pytest.fixture(scope="module")
+def coordinator() -> CoordinatorAgent:
+    return CoordinatorAgent(use_llm=False)
 
-    assert result.succeeded == 50
-    assert result.failed == 0
-    assert len(writer.outputs) == 50
-    assert [output.case_id for output in writer.outputs] == [
-        f"EC_{index:03d}" for index in range(1, 51)
+
+def _load_case(case_id: str) -> dict:
+    return json.loads((ROOT / "input" / f"{case_id}.json").read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize("case_id", sorted(EXPECTED))
+def test_case_end_to_end(coordinator: CoordinatorAgent, case_id: str) -> None:
+    issue, refund, payment_total = EXPECTED[case_id]
+    output = coordinator.handle_case(_load_case(case_id))
+
+    assert output["case_id"] == case_id
+    assert output["assessment"]["primary_issue"] == issue
+    assert output["financial_resolution"]["recommended_refund_brl"] == refund
+    assert output["financial_resolution"]["payment_total_brl"] == payment_total
+    expected_status = "action_required" if refund > 0 else "no_action"
+    assert output["assessment"]["case_status"] == expected_status
+    assert validate_case_output(output) == []
+    assert any(e.startswith("policy:") for e in output["evidence_ids"])
+    assert output["affected_entities"]["order_ids"] == [
+        _load_case(case_id)["customer_request"]["claimed_order_id"]
     ]
 
-    events = [
-        json.loads(line)
-        for line in (tmp_path / "trace.jsonl").read_text(encoding="utf-8").splitlines()
-    ]
-    assert events[0]["event_type"] == "run_started"
-    assert events[-1]["event_type"] == "run_finished"
-    assert events[-1]["details"] == {"succeeded": 50, "failed": 0}
+
+def test_unavailable_case_has_empty_items_and_zero_totals(
+    coordinator: CoordinatorAgent,
+) -> None:
+    output = coordinator.handle_case(_load_case("EC_005"))
+    assert output["affected_entities"]["item_ids"] == []
+    assert output["affected_entities"]["seller_ids"] == []
+    assert output["financial_resolution"]["item_total_brl"] == 0.0
+    assert output["financial_resolution"]["freight_total_brl"] == 0.0
+
+
+def test_seller_case_names_responsible_seller(coordinator: CoordinatorAgent) -> None:
+    output = coordinator.handle_case(_load_case("EC_001"))
+    parties = output["root_cause_analysis"]["responsible_parties"]
+    assert parties and all(p["party_type"] == "seller" for p in parties)
+    assert any(e.startswith("seller:") for e in output["evidence_ids"])

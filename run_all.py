@@ -1,141 +1,83 @@
-"""CLI entry point for validating or processing one/all dispute cases."""
+"""Command-line entry point for running one case or all cases.
 
+Usage:
+    python run_all.py                 # all 50 cases, LLM intent on, fresh trace
+    python run_all.py --case EC_004   # single case
+    python run_all.py --no-llm        # deterministic pipeline only (CI/tests)
+"""
 from __future__ import annotations
 
 import argparse
 import json
-import re
 import sys
-from importlib import import_module
+import time
+from collections import Counter
 from pathlib import Path
-from typing import Any, Sequence
 
-from pydantic import ValidationError
+ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(ROOT))
 
 from agents.coordinator_agent import CoordinatorAgent
-from shared.schemas import CaseInput
-from shared.trace import TraceWriter
+from services.output_writer import write_case_output
+from shared.constants import (
+    MODEL_FRAMEWORK,
+    MODEL_NAME,
+    MODEL_PARAMETER_SIZE_BILLION,
+    MODEL_RUNTIME,
+)
+from shared.trace import DEFAULT_TRACE_PATH, TraceLogger
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent
-OFFICIAL_CASE_NAMES = tuple(f"EC_{index:03d}.json" for index in range(1, 51))
+def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--case", help="run a single case ID, e.g. EC_004")
+    parser.add_argument("--input-dir", default=ROOT / "input", type=Path)
+    parser.add_argument("--output-dir", default=ROOT / "output", type=Path)
+    parser.add_argument("--trace", default=DEFAULT_TRACE_PATH, type=Path)
+    parser.add_argument("--no-llm", action="store_true", help="skip LLM intent classification")
+    args = parser.parse_args()
 
-
-class CompositionError(RuntimeError):
-    """Raised when a teammate-owned runtime component is unavailable."""
-
-
-def load_cases(input_dir: str | Path, case_id: str | None = None) -> list[CaseInput]:
-    directory = Path(input_dir)
-    if not directory.is_dir():
-        raise FileNotFoundError(f"input directory does not exist: {directory}")
-
-    if case_id is not None:
-        if re.fullmatch(r"EC_\d{3}", case_id) is None:
-            raise ValueError("--case must use the EC_001 format")
-        paths = [directory / f"{case_id}.json"]
-        if not paths[0].is_file():
-            raise FileNotFoundError(f"case input does not exist: {paths[0]}")
-    else:
-        paths = sorted(directory.glob("EC_*.json"))
-        actual_names = tuple(path.name for path in paths)
-        if actual_names != OFFICIAL_CASE_NAMES:
-            missing = sorted(set(OFFICIAL_CASE_NAMES) - set(actual_names))
-            unexpected = sorted(set(actual_names) - set(OFFICIAL_CASE_NAMES))
-            raise ValueError(
-                "official run requires exactly EC_001.json through EC_050.json; "
-                f"missing={missing}, unexpected={unexpected}"
-            )
-
-    cases: list[CaseInput] = []
-    for path in paths:
-        try:
-            raw = json.loads(path.read_text(encoding="utf-8"))
-            case = CaseInput.model_validate(raw)
-        except (json.JSONDecodeError, ValidationError) as exc:
-            raise ValueError(f"invalid case input {path}: {exc}") from exc
-        if path.stem != case.case_id:
-            raise ValueError(f"filename {path.name} does not match case_id {case.case_id}")
-        cases.append(case)
-
-    return cases
-
-
-def _component(module_name: str, class_name: str) -> type[Any]:
-    module = import_module(module_name)
-    component = getattr(module, class_name, None)
-    if component is None:
-        raise CompositionError(
-            f"{module_name}.{class_name} is not implemented; "
-            "the owning team member must provide the agreed A2A contract"
-        )
-    return component
-
-
-def build_default_coordinator(args: argparse.Namespace) -> CoordinatorAgent:
-    """Compose teammate-owned agents using their agreed constructor contract."""
-
-    order_seller_cls = _component("agents.order_seller_agent", "OrderSellerAgent")
-    payment_cls = _component("agents.payment_agent", "PaymentAgent")
-    delivery_cls = _component("agents.delivery_agent", "DeliveryAgent")
-    policy_cls = _component("agents.policy_agent", "PolicyAgent")
-    verifier_cls = _component("agents.verifier_agent", "VerifierAgent")
-    output_writer_cls = _component("services.output_writer", "OutputWriter")
-
-    return CoordinatorAgent(
-        order_seller_agent=order_seller_cls(data_dir=args.data_dir),
-        payment_agent=payment_cls(data_dir=args.data_dir),
-        delivery_agent=delivery_cls(data_dir=args.data_dir),
-        policy_agent=policy_cls(),
-        verifier_agent=verifier_cls(data_dir=args.data_dir),
-        trace_writer=TraceWriter(args.trace_file),
-        output_writer=output_writer_cls(output_dir=args.output_dir),
-        timeout_seconds=args.timeout,
-        max_retries=args.retries,
-    )
-
-
-def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Run the Olist dispute pipeline")
-    selection = parser.add_mutually_exclusive_group(required=True)
-    selection.add_argument("--case", help="run one case, for example EC_001")
-    selection.add_argument("--all", action="store_true", help="run all 50 official cases")
-    parser.add_argument("--validate-only", action="store_true", help="validate inputs without calling agents")
-    parser.add_argument("--input-dir", type=Path, default=PROJECT_ROOT / "input")
-    parser.add_argument("--data-dir", type=Path, default=PROJECT_ROOT / "data")
-    parser.add_argument("--output-dir", type=Path, default=PROJECT_ROOT / "output")
-    parser.add_argument("--trace-file", type=Path, default=PROJECT_ROOT / "trace.jsonl")
-    parser.add_argument("--timeout", type=float, default=30.0, help="seconds allowed per agent call")
-    parser.add_argument("--retries", type=int, default=1, help="retries after a failed agent call")
-    parser.add_argument("--fail-fast", action="store_true", help="stop after the first failed case")
-    return parser
-
-
-def main(argv: Sequence[str] | None = None) -> int:
-    parser = build_parser()
-    args = parser.parse_args(argv)
-    try:
-        cases = load_cases(args.input_dir, args.case)
-        if args.validate_only:
-            print(f"Validated {len(cases)} input case(s).")
-            return 0
-
-        coordinator = build_default_coordinator(args)
-        try:
-            result = coordinator.run(cases, continue_on_error=not args.fail_fast)
-        finally:
-            coordinator.close()
-    except Exception as exc:
-        print(f"ERROR: {exc}", file=sys.stderr)
+    case_files = sorted(args.input_dir.glob("EC_*.json"))
+    if args.case:
+        case_files = [path for path in case_files if path.stem == args.case]
+    if not case_files:
+        print(f"No case files found in {args.input_dir}", file=sys.stderr)
         return 1
 
-    print(
-        f"Run {result.run_id}: {result.succeeded} succeeded, "
-        f"{result.failed} failed. Trace: {args.trace_file}"
-    )
-    for case_id, error in sorted(result.errors.items()):
-        print(f"  {case_id}: {error}", file=sys.stderr)
-    return 0 if result.failed == 0 else 1
+    coordinator = CoordinatorAgent(use_llm=not args.no_llm)
+    issues: Counter[str] = Counter()
+    started = time.time()
+
+    with TraceLogger(args.trace) as trace:
+        trace.log(
+            "run_start",
+            model=MODEL_NAME,
+            parameter_size_billion=MODEL_PARAMETER_SIZE_BILLION,
+            framework=MODEL_FRAMEWORK,
+            runtime=MODEL_RUNTIME,
+            llm_enabled=not args.no_llm,
+            case_count=len(case_files),
+        )
+        for path in case_files:
+            case = json.loads(path.read_text(encoding="utf-8"))
+            output = coordinator.handle_case(case, trace)
+            write_case_output(output, args.output_dir)
+            issues[output["assessment"]["primary_issue"]] += 1
+            print(
+                f"{case['case_id']}: {output['assessment']['primary_issue']}"
+                f" (refund {output['financial_resolution']['recommended_refund_brl']} BRL)"
+            )
+        trace.log(
+            "run_complete",
+            cases=len(case_files),
+            seconds=round(time.time() - started, 1),
+            primary_issue_counts=dict(issues),
+        )
+
+    print(f"\n{len(case_files)} case(s) in {time.time() - started:.1f}s -> {args.output_dir}")
+    for issue, count in issues.most_common():
+        print(f"  {issue}: {count}")
+    return 0
 
 
 if __name__ == "__main__":

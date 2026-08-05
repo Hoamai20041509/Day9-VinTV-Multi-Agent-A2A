@@ -1,122 +1,90 @@
-# Multi-Agent Dispute Resolution Architecture
+# Multi-Agent Architecture — E-commerce Dispute Resolution
 
-## Goals
+## Tổng quan
 
-The system processes `input/EC_001.json` through `EC_050.json`, collects
-verifiable evidence from domain agents, applies `EC_POLICY_V1`, verifies the
-result, and writes one matching JSON file per case. Domain calculations remain
-outside the coordinator.
+Hệ thống điều tra 50 case khiếu nại trên dữ liệu Olist bằng 6 agent chuyên trách.
+Mỗi agent chỉ được truy cập đúng domain dữ liệu của mình; mọi kết luận đi qua
+handoff có cấu trúc và được Verifier kiểm chứng trước khi ghi file. Toàn bộ phép
+tính tiền và so sánh timestamp là code Python thuần (deterministic); LLM chỉ dùng
+để phân loại intent của khách hàng và ghi chú vào trace — model không bao giờ
+tạo ra số liệu được chấm điểm.
 
-## Components And Ownership
+## Model
 
-| Component | Owner | Data access | Responsibility |
-| --- | --- | --- | --- |
-| Coordinator Agent | TV1 | Input cases and agent responses | Orchestration, timeout/retry, correlation, trace, and output handoff |
-| Order & Seller Agent | TV2 | orders, order_items, sellers | Order state, items, sellers, totals, and late seller handoff evidence |
-| Payment Agent | TV3 | order_payments | Payment rows, totals, split-payment detection, and reconciliation |
-| Delivery Agent | TV4 | order timestamps plus TV2 handoff | Late/on-time classification and delivery cause candidate |
-| Policy Agent | TV5 | Structured results from TV2-TV4 | Ordered application of `EC_POLICY_V1` |
-| Verifier Agent | TV5 | Draft output and source data when needed | Schema, evidence, ID, money, and limit validation |
-| Output Writer | TV5 | Verified output only | Atomic JSON output creation |
+| Thuộc tính | Giá trị |
+| --- | --- |
+| Model | `Qwen/Qwen2.5-1.5B-Instruct` (khai báo tại `shared/constants.py`) |
+| Kích thước | 1.54B parameters (≤ 10B) |
+| Framework | transformers (PyTorch), greedy decoding |
+| Runtime | local (Apple Silicon MPS / CPU) |
 
-The coordinator must not query CSV files or reproduce calculations owned by a
-domain agent. The verifier is the final gate before any output is written.
-
-## Runtime Flow
+## Sơ đồ agent và luồng handoff
 
 ```mermaid
-sequenceDiagram
-    participant R as run_all.py
-    participant C as Coordinator
-    participant O as OrderSellerAgent
-    participant P as PaymentAgent
-    participant D as DeliveryAgent
-    participant E as PolicyAgent
-    participant V as VerifierAgent
-    participant W as OutputWriter
+flowchart TD
+    IN[input/EC_xxx.json] --> CO[Coordinator Agent]
+    CO -- "1. order_id" --> OS[Order & Seller Agent]
+    OS -- "status, items, sellers,\nitem/freight totals,\nlate handoff sellers" --> CO
+    CO -- "2. order_id + item/freight totals" --> PA[Payment Agent]
+    PA -- "payment_total, split flag,\nreconciled, payment IDs" --> CO
+    CO -- "3. order_id" --> DA[Delivery Agent]
+    DA -- "delivered_late vs estimate" --> CO
+    CO -- "4. facts tổng hợp" --> PO[Policy Agent]
+    PO -- "primary_issue, refund,\nroot cause, action" --> CO
+    CO -- "5. output đề xuất" --> VE[Verifier Agent]
+    VE -- "violations / pass" --> CO
+    CO --> OUT[output/EC_xxx.json]
+    CO --> TR[logging/trace.jsonl]
 
-    R->>C: CaseInput
-    C->>O: order_seller.request
-    O-->>C: order_seller.result
-    C->>P: payment.request + order financial totals
-    P-->>C: payment.result
-    C->>D: delivery.request + seller handoff result
-    D-->>C: delivery.result
-    C->>E: policy.request + all domain results
-    E-->>C: policy.result (draft CaseOutput)
-    C->>V: verifier.request + draft CaseOutput
-    V-->>C: verifier.result
-    alt verified
-        C->>W: verified CaseOutput
-    else rejected
-        C-->>R: case error; no output written
-    end
+    OS -.đọc.-> D1[(orders.csv\norder_items.csv\nsellers.csv)]
+    PA -.đọc.-> D2[(order_payments.csv)]
+    DA -.đọc.-> D3[(orders.csv)]
+    VE -.đọc.-> D4[(tất cả CSV\nchỉ để kiểm chứng ID)]
 ```
 
-Payment and delivery are downstream of Order & Seller because both need its
-normalized totals or handoff findings. They may be parallelized later without
-changing the message contracts.
+## Vai trò và quyền truy cập dữ liệu
 
-## A2A Contract
+| Agent | File | Quyền dữ liệu | Nhiệm vụ |
+| --- | --- | --- | --- |
+| Coordinator | `agents/coordinator_agent.py` | không đọc CSV trực tiếp | Nhận case, phân loại intent (LLM), điều phối handoff, lắp ráp output |
+| Order & Seller | `agents/order_seller_agent.py` | orders, order_items, sellers | Kiểm tra order tồn tại/trạng thái; item, seller, `item_total_brl`, `freight_total_brl`; so sánh `order_delivered_carrier_date` với từng `shipping_limit_date` → seller bàn giao muộn |
+| Payment | `agents/payment_agent.py` | order_payments | Tổng payment (làm tròn 2 chữ số), đếm payment row, phát hiện split payment, đối soát với item+freight trong sai số 0.10 BRL, dựng `payment:<order>:<seq>` |
+| Delivery | `agents/delivery_agent.py` | orders | So sánh `order_delivered_customer_date` với `order_estimated_delivery_date` |
+| Policy | `agents/policy_agent.py` + `services/policy_engine.py` | không đọc CSV (chỉ nhận facts) | Áp dụng EC_POLICY_V1 theo đúng thứ tự ưu tiên, tính refund và action |
+| Verifier | `agents/verifier_agent.py` | tất cả CSV (read-only) | Gate cuối: schema/caps/rounding, mọi evidence ID phải tồn tại trong CSV, refund khớp rule, `case_status` khớp refund |
 
-All calls implement `AgentPort.handle(A2AMessage) -> A2AMessage` from
-`shared/a2a_messages.py`. Each response must preserve:
+## Thứ tự ưu tiên rule (EC_POLICY_V1)
 
-- the request `correlation_id`;
-- the input `case_id`;
-- the request ID as `causation_id`;
-- the expected sender, recipient, and response message type.
+1. `canceled_order_paid` → hoàn toàn bộ payment (platform)
+2. `unavailable_order_paid` → hoàn toàn bộ payment (platform)
+3. `late_delivery_seller` → hoàn freight (seller bàn giao sau shipping limit)
+4. `late_delivery_logistics` → hoàn freight (carrier giao trễ dù seller đúng hạn)
+5. `valid_split_payment` → 0, giải thích split payment hợp lệ
+6. `unsupported_late_claim` → 0, bác bỏ khiếu nại giao trễ
 
-Payloads are validated using the models in `shared/schemas.py`. Extra fields are
-rejected so contract drift is detected during integration rather than silently
-ignored.
+## Nguyên tắc thiết kế
 
-## Agent Construction Contract
-
-`run_all.py` composes teammate-owned classes with these public constructors:
-
-```python
-OrderSellerAgent(data_dir: Path)
-PaymentAgent(data_dir: Path)
-DeliveryAgent(data_dir: Path)
-PolicyAgent()
-VerifierAgent(data_dir: Path)
-OutputWriter(output_dir: Path)
-```
-
-Each agent exposes the correct `AgentName` in its `name` attribute and implements
-`handle`. `OutputWriter.write(CaseOutput)` must write atomically and return only
-after the JSON file is complete.
-
-## Failure And Timeout Behavior
-
-- Every agent call has a configurable timeout, defaulting to 30 seconds.
-- Failed responses are retried only when marked retryable; exceptions and
-  timeouts use the configured retry count.
-- A failed case never receives fabricated domain evidence or an unverified
-  output.
-- The 50-case runner continues with later cases by default and returns a nonzero
-  exit code if any case fails. `--fail-fast` stops on the first error.
-- Response case/order identity is checked to prevent cross-case contamination.
+- **Deterministic core, LLM ở rìa**: số tiền, timestamp, evidence đều do code
+  thuần tính; LLM (intent, narration) không thể làm sai output được chấm.
+- **Facts-only policy**: Policy Agent không đọc CSV — chỉ quyết định trên facts
+  các agent khác bàn giao, nên mọi kết luận truy vết được trong trace.
+- **Verifier là hard gate**: output vi phạm (evidence không tồn tại, refund sai
+  rule, quá cap) sẽ raise lỗi thay vì ghi file sai.
+- **Không suy diễn dữ liệu không tồn tại**: Olist không có refund ledger,
+  transaction ID hay tracking checkpoint → không bao giờ xuất hiện trong output.
 
 ## Trace
 
-`trace.jsonl` is truncated at the start of every run. It contains run, case,
-handoff, timeout/error, and completion events. Each case uses one correlation ID
-through all five agent stages. Test traces are written to temporary directories;
-the root trace is reserved for the latest real run.
+`logging/trace.jsonl` ghi một lượt chạy mới nhất (không append): `run_start`
+(model metadata) → per case: `case_start`, `llm_intent`, các cặp
+`handoff`/`finding` cho từng agent, `verify`, `case_complete` → `run_complete`
+(phân bố primary issue, thời gian chạy).
 
-## Validation And Submission
+## Chạy
 
-```powershell
-python run_all.py --all --validate-only
-python run_all.py --case EC_001
-python run_all.py --all
-pytest -q
+```bash
+python run_all.py             # 50 case, LLM intent bật
+python run_all.py --case EC_004
+python run_all.py --no-llm    # chỉ pipeline deterministic (CI/test)
+python -m pytest tests/       # 43 tests
 ```
-
-The submission archive must select exactly `output/EC_001.json` through
-`output/EC_050.json`. Repository placeholders, source, trace, metadata, and
-secrets must not be included. Models used by agents must have at most 10 billion
-parameters, and the exact model names must be declared in source and recorded in
-`metadata.json`.

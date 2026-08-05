@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Any, Sequence
 
 from shared.constants import (
+    MODEL_DO_SAMPLE,
     MODEL_ENABLE_THINKING,
     MODEL_MAX_NEW_TOKENS,
     MODEL_NAME,
@@ -15,7 +16,7 @@ from shared.constants import (
 
 
 class QwenModelClient:
-    """Load Qwen3 only when generation is requested.
+    """Load the configured Qwen model only when generation is requested.
 
     Keeping model loading lazy allows repository and policy tests to run without
     downloading the model weights or allocating accelerator memory.
@@ -65,13 +66,16 @@ class QwenModelClient:
         model_inputs = self._tokenizer([prompt], return_tensors="pt").to(
             self._model.device
         )
+        sampling_kwargs = (
+            {"temperature": MODEL_TEMPERATURE, "top_p": MODEL_TOP_P, "top_k": MODEL_TOP_K}
+            if MODEL_DO_SAMPLE
+            else {}
+        )
         generated_ids = self._model.generate(
             **model_inputs,
             max_new_tokens=max_new_tokens,
-            do_sample=True,
-            temperature=MODEL_TEMPERATURE,
-            top_p=MODEL_TOP_P,
-            top_k=MODEL_TOP_K,
+            do_sample=MODEL_DO_SAMPLE,
+            **sampling_kwargs,
         )
         output_ids = generated_ids[0][len(model_inputs.input_ids[0]) :]
         response = self._tokenizer.decode(output_ids, skip_special_tokens=True)

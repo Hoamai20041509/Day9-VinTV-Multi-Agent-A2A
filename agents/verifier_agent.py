@@ -1,103 +1,82 @@
-"""Final schema and evidence verifier."""
+"""Verifier Agent - final gate before a case output is written to disk.
 
+Checks three layers:
+1. structure - schema shape, caps, enums, rounding (shared.schemas)
+2. evidence  - every evidence ID must be well-formed AND exist in the CSVs
+3. finance   - the refund must match what the primary issue prescribes
+"""
 from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
+from services import payment_repository
 from services.item_repository import ItemRepository
 from services.order_repository import OrderRepository
-from services import payment_repository
-from shared.a2a_messages import A2AMessage, AgentName, MessageType
-from shared.schemas import CaseOutput, VerificationResult
+from shared.evidence import ROOT_CAUSE_CODES, parse_evidence_id
+from shared.schemas import validate_case_output
 
 
 class VerifierAgent:
-    """Reject malformed outputs and evidence that cannot be checked in CSV data."""
-
-    name = AgentName.VERIFIER
-
     def __init__(
         self,
-        data_dir: str | Path | None = None,
         order_repository: OrderRepository | None = None,
         item_repository: ItemRepository | None = None,
     ) -> None:
-        if data_dir is not None and (order_repository is not None or item_repository is not None):
-            raise ValueError("data_dir cannot be combined with explicit repositories")
-        if data_dir is not None:
-            data_path = Path(data_dir)
-            order_repository = OrderRepository(data_path / "olist_orders_dataset.csv")
-            item_repository = ItemRepository(
-                data_path / "olist_order_items_dataset.csv",
-                data_path / "olist_sellers_dataset.csv",
-            )
-            self._payments_path = data_path / "olist_order_payments_dataset.csv"
-        else:
-            self._payments_path = None
-        self._payments_by_order: dict[str, list[dict]] | None = None
         self.order_repository = order_repository or OrderRepository()
         self.item_repository = item_repository or ItemRepository()
 
-    def verify(self, case_id: str, draft_output: Any) -> VerificationResult:
-        errors: list[str] = []
-        try:
-            output = CaseOutput.model_validate(draft_output)
-        except Exception as exc:
-            return VerificationResult(case_id=case_id, is_valid=False, errors=[str(exc)])
-
-        if output.case_id != case_id:
-            errors.append("output case_id mismatch")
-        for evidence_id in output.evidence_ids:
-            if not self._evidence_exists(evidence_id):
-                errors.append(f"unknown evidence: {evidence_id}")
-
-        if errors:
-            return VerificationResult(case_id=case_id, is_valid=False, errors=errors)
-        return VerificationResult(case_id=case_id, is_valid=True, verified_output=output)
-
-    def _evidence_exists(self, evidence_id: str) -> bool:
-        kind, rest = evidence_id.split(":", 1)
-        if kind == "policy":
-            return True
+    def _evidence_exists(self, kind: str, parts: tuple[str, ...]) -> bool:
         if kind == "order":
-            return self.order_repository.get_order(rest) is not None
-        if kind == "seller":
-            return self.item_repository.get_seller(rest) is not None
+            return self.order_repository.exists(parts[0])
         if kind == "item":
-            order_id, item_seq = rest.rsplit(":", 1)
-            return any(str(item["order_item_id"]) == item_seq for item in self.item_repository.get_items(order_id))
+            order_id, item_id = parts
+            return any(
+                str(item["order_item_id"]) == item_id
+                for item in self.item_repository.get_items(order_id)
+            )
         if kind == "payment":
-            order_id, payment_seq = rest.rsplit(":", 1)
-            return any(str(row["payment_sequential"]) == payment_seq for row in self._payment_rows(order_id))
+            order_id, sequential = parts
+            return any(
+                str(row["payment_sequential"]) == sequential
+                for row in payment_repository.get_payments(order_id)
+            )
+        if kind == "seller":
+            return self.item_repository.get_seller(parts[0]) is not None
+        if kind == "policy":
+            return parts[0] in ROOT_CAUSE_CODES
         return False
 
-    def _payment_rows(self, order_id: str) -> list[dict]:
-        if self._payments_path is None:
-            return payment_repository.get_payments(order_id)
-        import csv
+    def verify(self, output: dict[str, Any]) -> list[str]:
+        """Return all violations found (empty list means the output may ship)."""
+        violations = validate_case_output(output)
 
-        if self._payments_by_order is None:
-            payments_by_order: dict[str, list[dict]] = {}
-            with self._payments_path.open(newline="", encoding="utf-8") as source:
-                for row in csv.DictReader(source):
-                    payments_by_order.setdefault(row["order_id"], []).append(row)
-            self._payments_by_order = payments_by_order
-        return list(self._payments_by_order.get(order_id, []))
+        for evidence_id in output.get("evidence_ids", []):
+            parsed = parse_evidence_id(evidence_id)
+            if parsed is None:
+                violations.append(f"malformed evidence ID {evidence_id!r}")
+            elif not self._evidence_exists(*parsed):
+                violations.append(f"evidence ID {evidence_id!r} not found in data")
 
-    def handle(self, message: A2AMessage) -> A2AMessage:
-        if message.message_type != MessageType.VERIFIER_REQUEST:
-            return A2AMessage.failure_response(
-                request=message,
-                sender=self.name,
-                message_type=MessageType.VERIFIER_RESULT,
-                code="unexpected_message",
-                message=f"unsupported message type: {message.message_type}",
+        financial = output.get("financial_resolution", {})
+        refund = financial.get("recommended_refund_brl")
+        issue = output.get("assessment", {}).get("primary_issue")
+        expected_refund = {
+            "canceled_order_paid": financial.get("payment_total_brl"),
+            "unavailable_order_paid": financial.get("payment_total_brl"),
+            "late_delivery_seller": financial.get("freight_total_brl"),
+            "late_delivery_logistics": financial.get("freight_total_brl"),
+            "valid_split_payment": 0.0,
+            "unsupported_late_claim": 0.0,
+        }.get(issue)
+        if expected_refund is not None and refund != expected_refund:
+            violations.append(
+                f"refund {refund} does not match policy for {issue} (expected {expected_refund})"
             )
-        result = self.verify(message.case_id, message.payload.get("draft_output"))
-        return A2AMessage.success_response(
-            request=message,
-            sender=self.name,
-            message_type=MessageType.VERIFIER_RESULT,
-            payload=result,
-        )
+
+        case_status = output.get("assessment", {}).get("case_status")
+        if isinstance(refund, (int, float)):
+            expected_status = "action_required" if refund > 0 else "no_action"
+            if case_status != expected_status:
+                violations.append(f"case_status {case_status!r} inconsistent with refund {refund}")
+
+        return violations

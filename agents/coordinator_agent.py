@@ -1,362 +1,209 @@
-"""Coordinator for the evidence-driven e-commerce dispute pipeline."""
+"""Coordinator Agent - receives a case, dispatches domain agents, applies the
+policy decision and assembles the final schema-compliant output.
 
+Handoff flow per case:
+    coordinator -> order_seller_agent  (status, items, sellers, totals, late handoff)
+    coordinator -> payment_agent       (payment rows, reconciliation)   [needs totals from order_seller]
+    coordinator -> delivery_agent      (actual vs estimated delivery)
+    coordinator -> policy_agent        (EC_POLICY_V1 decision on the combined facts)
+    coordinator -> verifier_agent      (schema/evidence/finance gate before writing)
+
+The LLM classifies the customer's message intent for the trace; every scored
+field is produced by deterministic code so a generation glitch can never
+corrupt an output file.
+"""
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutureTimeoutError
-from dataclasses import dataclass, field
-from time import perf_counter
-from typing import Any, TypeVar
-from uuid import uuid4
+from typing import Any
 
-from pydantic import BaseModel
+from agents.delivery_agent import DeliveryAgent
+from agents.order_seller_agent import OrderSellerAgent
+from agents.payment_agent import PaymentAgent
+from agents.policy_agent import PolicyAgent
+from agents.verifier_agent import VerifierAgent
+from services.data_loader import get_item_repository, get_order_repository
+from services.model_client import QwenModelClient
+from services.policy_engine import PolicyDecision
+from shared.constants import MAX_ENTITY_IDS, MAX_EVIDENCE_IDS, MODEL_NAME
+from shared.evidence import policy_evidence
 
-from shared.a2a_messages import (
-    A2AMessage,
-    AgentName,
-    AgentPort,
-    MessageStatus,
-    MessageType,
-    OutputWriterPort,
+INTENT_LABELS = (
+    "late_delivery",
+    "canceled_refund",
+    "unavailable_refund",
+    "split_payment_check",
+    "other",
 )
-from shared.schemas import (
-    CaseInput,
-    CaseOutput,
-    DeliveryResult,
-    OrderSellerResult,
-    PaymentResult,
-    PolicyResult,
-    VerificationResult,
-)
-from shared.trace import TraceWriter
-
-
-ResultModel = TypeVar("ResultModel", bound=BaseModel)
-
-
-class CaseProcessingError(RuntimeError):
-    def __init__(self, case_id: str, stage: str, message: str) -> None:
-        super().__init__(f"{case_id} failed at {stage}: {message}")
-        self.case_id = case_id
-        self.stage = stage
-        self.detail = message
-
-
-@dataclass(slots=True)
-class BatchRunResult:
-    run_id: str
-    outputs: list[CaseOutput] = field(default_factory=list)
-    errors: dict[str, str] = field(default_factory=dict)
-
-    @property
-    def succeeded(self) -> int:
-        return len(self.outputs)
-
-    @property
-    def failed(self) -> int:
-        return len(self.errors)
 
 
 class CoordinatorAgent:
-    """Orchestrate domain agents without implementing their domain logic."""
+    def __init__(self, use_llm: bool = True) -> None:
+        order_repo = get_order_repository()
+        item_repo = get_item_repository()
+        self.order_seller_agent = OrderSellerAgent(order_repo, item_repo)
+        self.payment_agent = PaymentAgent()
+        self.delivery_agent = DeliveryAgent(order_repo)
+        self.policy_agent = PolicyAgent()
+        self.verifier_agent = VerifierAgent(order_repo, item_repo)
+        self.use_llm = use_llm
+        self._model_client = QwenModelClient() if use_llm else None
 
-    def __init__(
-        self,
-        *,
-        order_seller_agent: AgentPort,
-        payment_agent: AgentPort,
-        delivery_agent: AgentPort,
-        policy_agent: AgentPort,
-        verifier_agent: AgentPort,
-        trace_writer: TraceWriter,
-        output_writer: OutputWriterPort | None = None,
-        timeout_seconds: float = 30.0,
-        max_retries: int = 1,
-    ) -> None:
-        if timeout_seconds <= 0:
-            raise ValueError("timeout_seconds must be positive")
-        if max_retries < 0:
-            raise ValueError("max_retries cannot be negative")
-
-        self._agents = {
-            AgentName.ORDER_SELLER: order_seller_agent,
-            AgentName.PAYMENT: payment_agent,
-            AgentName.DELIVERY: delivery_agent,
-            AgentName.POLICY: policy_agent,
-            AgentName.VERIFIER: verifier_agent,
-        }
-        for expected_name, agent in self._agents.items():
-            if getattr(agent, "name", None) != expected_name:
-                raise ValueError(f"agent registered for {expected_name.value} has wrong name")
-            if not callable(getattr(agent, "handle", None)):
-                raise TypeError(f"{expected_name.value} agent must implement handle(message)")
-
-        self._trace = trace_writer
-        self._output_writer = output_writer
-        self._timeout_seconds = timeout_seconds
-        self._max_retries = max_retries
-        self._executor = ThreadPoolExecutor(max_workers=5, thread_name_prefix="agent")
-
-    def close(self) -> None:
-        self._executor.shutdown(wait=False, cancel_futures=True)
-
-    def __enter__(self) -> "CoordinatorAgent":
-        return self
-
-    def __exit__(self, *_: Any) -> None:
-        self.close()
-
-    def run(
-        self,
-        cases: list[CaseInput],
-        *,
-        continue_on_error: bool = True,
-    ) -> BatchRunResult:
-        self._validate_case_batch(cases)
-        run_id = uuid4().hex
-        result = BatchRunResult(run_id=run_id)
-        self._trace.start_run(run_id, case_count=len(cases))
-
-        for case in cases:
-            try:
-                output = self.process_case(case)
-                if self._output_writer is not None:
-                    self._output_writer.write(output)
-                result.outputs.append(output)
-                self._trace.record(
-                    event_type="case_finished",
-                    status="succeeded",
-                    case_id=case.case_id,
-                    details={"order_id": case.order_id, "output_written": self._output_writer is not None},
-                )
-            except Exception as exc:
-                result.errors[case.case_id] = str(exc)
-                self._trace.record(
-                    event_type="case_finished",
-                    status="failed",
-                    case_id=case.case_id,
-                    details={"order_id": case.order_id, "error": str(exc)},
-                )
-                if not continue_on_error:
-                    self._trace.finish_run(succeeded=result.succeeded, failed=result.failed)
-                    raise
-
-        self._trace.finish_run(succeeded=result.succeeded, failed=result.failed)
-        return result
-
-    def process_case(self, case: CaseInput) -> CaseOutput:
-        correlation_id = uuid4().hex
-        self._trace.record(
-            event_type="case_started",
-            status="started",
-            case_id=case.case_id,
-            correlation_id=correlation_id,
-            details={"order_id": case.order_id, "policy_version": case.policy_version},
+    def classify_intent(self, message: str) -> str:
+        """LLM triage of the customer message; recorded in the trace only."""
+        if self._model_client is None:
+            return "llm_disabled"
+        prompt = (
+            "Phân loại yêu cầu của khách hàng vào đúng một nhãn trong danh sách: "
+            f"{', '.join(INTENT_LABELS)}. Chỉ trả về nhãn.\n\nYêu cầu: {message}"
         )
-
-        order_result = self._request_result(
-            case=case,
-            correlation_id=correlation_id,
-            recipient=AgentName.ORDER_SELLER,
-            request_type=MessageType.ORDER_SELLER_REQUEST,
-            response_type=MessageType.ORDER_SELLER_RESULT,
-            payload={"case_id": case.case_id, "order_id": case.order_id},
-            result_model=OrderSellerResult,
-            stage="order_seller",
-        )
-        self._validate_domain_identity(case, order_result.case_id, order_result.order_id, "order_seller")
-
-        payment_result = self._request_result(
-            case=case,
-            correlation_id=correlation_id,
-            recipient=AgentName.PAYMENT,
-            request_type=MessageType.PAYMENT_REQUEST,
-            response_type=MessageType.PAYMENT_RESULT,
-            payload={
-                "case_id": case.case_id,
-                "order_id": case.order_id,
-                "item_total_brl": order_result.item_total_brl,
-                "freight_total_brl": order_result.freight_total_brl,
-            },
-            result_model=PaymentResult,
-            stage="payment",
-        )
-        self._validate_domain_identity(case, payment_result.case_id, payment_result.order_id, "payment")
-
-        delivery_result = self._request_result(
-            case=case,
-            correlation_id=correlation_id,
-            recipient=AgentName.DELIVERY,
-            request_type=MessageType.DELIVERY_REQUEST,
-            response_type=MessageType.DELIVERY_RESULT,
-            payload={
-                "case_id": case.case_id,
-                "order_id": case.order_id,
-                "order_delivered_carrier_date": order_result.order_delivered_carrier_date,
-                "order_delivered_customer_date": order_result.order_delivered_customer_date,
-                "order_estimated_delivery_date": order_result.order_estimated_delivery_date,
-                "late_handoffs": order_result.late_handoffs,
-            },
-            result_model=DeliveryResult,
-            stage="delivery",
-        )
-        self._validate_domain_identity(case, delivery_result.case_id, delivery_result.order_id, "delivery")
-
-        policy_result = self._request_result(
-            case=case,
-            correlation_id=correlation_id,
-            recipient=AgentName.POLICY,
-            request_type=MessageType.POLICY_REQUEST,
-            response_type=MessageType.POLICY_RESULT,
-            payload={
-                "case": case,
-                "order_seller_result": order_result,
-                "payment_result": payment_result,
-                "delivery_result": delivery_result,
-            },
-            result_model=PolicyResult,
-            stage="policy",
-        )
-        if policy_result.case_id != case.case_id:
-            raise CaseProcessingError(case.case_id, "policy", "response case_id mismatch")
-        if policy_result.draft_output.case_id != case.case_id:
-            raise CaseProcessingError(case.case_id, "policy", "draft output case_id mismatch")
-
-        verification = self._request_result(
-            case=case,
-            correlation_id=correlation_id,
-            recipient=AgentName.VERIFIER,
-            request_type=MessageType.VERIFIER_REQUEST,
-            response_type=MessageType.VERIFIER_RESULT,
-            payload={"case": case, "draft_output": policy_result.draft_output},
-            result_model=VerificationResult,
-            stage="verifier",
-        )
-        if verification.case_id != case.case_id:
-            raise CaseProcessingError(case.case_id, "verifier", "response case_id mismatch")
-        if not verification.is_valid or verification.verified_output is None:
-            errors = "; ".join(verification.errors) or "output rejected"
-            raise CaseProcessingError(case.case_id, "verifier", errors)
-        if verification.verified_output.case_id != case.case_id:
-            raise CaseProcessingError(case.case_id, "verifier", "verified output case_id mismatch")
-
-        return verification.verified_output
-
-    def _request_result(
-        self,
-        *,
-        case: CaseInput,
-        correlation_id: str,
-        recipient: AgentName,
-        request_type: MessageType,
-        response_type: MessageType,
-        payload: dict[str, Any],
-        result_model: type[ResultModel],
-        stage: str,
-    ) -> ResultModel:
-        request = A2AMessage.request(
-            correlation_id=correlation_id,
-            case_id=case.case_id,
-            recipient=recipient,
-            message_type=request_type,
-            payload=payload,
-        )
-        response = self._dispatch(request, response_type=response_type, stage=stage)
         try:
-            return result_model.model_validate(response.payload)
-        except Exception as exc:
-            raise CaseProcessingError(case.case_id, stage, f"invalid response payload: {exc}") from exc
+            raw = self._model_client.generate(
+                [{"role": "user", "content": prompt}], max_new_tokens=8
+            ).lower()
+        except Exception:
+            return "unclassified"
+        for label in INTENT_LABELS:
+            if label in raw:
+                return label
+        return "other"
 
-    def _dispatch(
+    def handle_case(self, case: dict[str, Any], trace: Any | None = None) -> dict[str, Any]:
+        case_id = case["case_id"]
+        order_id = case["customer_request"]["claimed_order_id"]
+
+        def _log(event: str, **fields: Any) -> None:
+            if trace is not None:
+                trace.log(event, case_id=case_id, **fields)
+
+        _log("case_start", order_id=order_id, policy_version=case.get("policy_version"))
+
+        intent = self.classify_intent(case["customer_request"]["message"])
+        _log("llm_intent", agent="coordinator", model=MODEL_NAME, intent=intent)
+
+        _log("handoff", sender="coordinator", recipient="order_seller_agent", payload={"order_id": order_id})
+        order_seller = self.order_seller_agent.analyze(order_id)
+        _log(
+            "finding",
+            agent="order_seller_agent",
+            payload={
+                "order_status": order_seller["order_status"],
+                "item_total_brl": order_seller["item_total_brl"],
+                "freight_total_brl": order_seller["freight_total_brl"],
+                "late_seller_ids": order_seller["late_seller_ids"],
+            },
+        )
+
+        _log(
+            "handoff",
+            sender="order_seller_agent",
+            recipient="payment_agent",
+            payload={
+                "order_id": order_id,
+                "item_total_brl": order_seller["item_total_brl"],
+                "freight_total_brl": order_seller["freight_total_brl"],
+            },
+        )
+        payment = self.payment_agent.analyze(
+            order_id, order_seller["item_total_brl"], order_seller["freight_total_brl"]
+        )
+        _log(
+            "finding",
+            agent="payment_agent",
+            payload={
+                "payment_total_brl": payment["financial_resolution"]["payment_total_brl"],
+                "payment_count": payment["payment_count"],
+                "is_split_payment": payment["is_split_payment"],
+                "reconciled": payment["reconciled"],
+            },
+        )
+
+        _log("handoff", sender="coordinator", recipient="delivery_agent", payload={"order_id": order_id})
+        delivery = self.delivery_agent.analyze(order_id)
+        _log("finding", agent="delivery_agent", payload=delivery)
+
+        _log("handoff", sender="coordinator", recipient="policy_agent", payload={"facts": "combined findings"})
+        decision = self.policy_agent.decide(order_seller, payment, delivery)
+        _log(
+            "finding",
+            agent="policy_agent",
+            payload={
+                "primary_issue": decision.primary_issue,
+                "root_cause_code": decision.root_cause_code,
+                "recommended_refund_brl": decision.recommended_refund_brl,
+                "action": decision.action,
+            },
+        )
+
+        output = self._assemble_output(case_id, order_id, order_seller, payment, decision)
+
+        violations = self.verifier_agent.verify(output)
+        _log("verify", agent="verifier_agent", violations=violations)
+        if violations:
+            raise ValueError(f"{case_id}: verifier rejected output: {violations}")
+
+        _log(
+            "case_complete",
+            primary_issue=decision.primary_issue,
+            recommended_refund_brl=decision.recommended_refund_brl,
+        )
+        return output
+
+    def _assemble_output(
         self,
-        request: A2AMessage,
-        *,
-        response_type: MessageType,
-        stage: str,
-    ) -> A2AMessage:
-        agent = self._agents[request.recipient]
-        last_error = "unknown agent error"
+        case_id: str,
+        order_id: str,
+        order_seller: dict[str, Any],
+        payment: dict[str, Any],
+        decision: PolicyDecision,
+    ) -> dict[str, Any]:
+        # Bare "<order_id>:<n>" forms for affected_entities; prefixed forms for evidence.
+        payment_entity_ids = [
+            pid.removeprefix("payment:") for pid in payment["payment_ids"][:MAX_ENTITY_IDS]
+        ]
 
-        for attempt in range(1, self._max_retries + 2):
-            self._trace.record_message("sent", request)
-            started = perf_counter()
-            future = self._executor.submit(agent.handle, request)
-            try:
-                raw_response = future.result(timeout=self._timeout_seconds)
-                elapsed_ms = (perf_counter() - started) * 1000
-                response = A2AMessage.model_validate(raw_response)
-                self._validate_response(request, response, response_type)
-                self._trace.record_message("received", response, duration_ms=elapsed_ms)
+        # Evidence budget (max 10): order + up to 3 items + up to 3 payments
+        # + responsible sellers (seller-fault cases only) + policy code.
+        if decision.primary_issue == "late_delivery_seller":
+            preferred_items = list(
+                dict.fromkeys(order_seller["late_item_ids"] + order_seller["item_ids"])
+            )
+            seller_ids_for_evidence = order_seller["late_seller_ids"][:2]
+        else:
+            preferred_items = order_seller["item_ids"]
+            seller_ids_for_evidence = []
 
-                if response.status == MessageStatus.SUCCEEDED:
-                    return response
+        evidence_ids = [f"order:{order_id}"]
+        evidence_ids += [f"item:{item_id}" for item_id in preferred_items[:3]]
+        evidence_ids += payment["payment_ids"][:3]
+        evidence_ids += [f"seller:{seller_id}" for seller_id in seller_ids_for_evidence]
+        evidence_ids.append(policy_evidence(decision.root_cause_code))
+        evidence_ids = list(dict.fromkeys(evidence_ids))[:MAX_EVIDENCE_IDS]
 
-                last_error = response.error.message if response.error else "agent returned failure"
-                retryable = bool(response.error and response.error.retryable)
-                if not retryable or attempt > self._max_retries:
-                    break
-            except FutureTimeoutError:
-                future.cancel()
-                last_error = f"timed out after {self._timeout_seconds:g}s"
-                self._trace.record(
-                    event_type="handoff_timeout",
-                    status="failed",
-                    case_id=request.case_id,
-                    correlation_id=request.correlation_id,
-                    actor="coordinator",
-                    message_id=request.message_id,
-                    duration_ms=(perf_counter() - started) * 1000,
-                    details={"stage": stage, "attempt": attempt},
-                )
-            except Exception as exc:
-                last_error = str(exc)
-                self._trace.record(
-                    event_type="handoff_error",
-                    status="failed",
-                    case_id=request.case_id,
-                    correlation_id=request.correlation_id,
-                    actor="coordinator",
-                    message_id=request.message_id,
-                    duration_ms=(perf_counter() - started) * 1000,
-                    details={"stage": stage, "attempt": attempt, "error": str(exc)},
-                )
-
-        raise CaseProcessingError(request.case_id, stage, last_error)
-
-    @staticmethod
-    def _validate_response(
-        request: A2AMessage,
-        response: A2AMessage,
-        expected_type: MessageType,
-    ) -> None:
-        if response.correlation_id != request.correlation_id:
-            raise ValueError("response correlation_id mismatch")
-        if response.causation_id != request.message_id:
-            raise ValueError("response causation_id mismatch")
-        if response.case_id != request.case_id:
-            raise ValueError("response case_id mismatch")
-        if response.sender != request.recipient:
-            raise ValueError("response sender mismatch")
-        if response.recipient != AgentName.COORDINATOR:
-            raise ValueError("response recipient must be coordinator")
-        if response.message_type != expected_type:
-            raise ValueError("unexpected response message_type")
-
-    @staticmethod
-    def _validate_domain_identity(
-        case: CaseInput,
-        result_case_id: str,
-        result_order_id: str,
-        stage: str,
-    ) -> None:
-        if result_case_id != case.case_id:
-            raise CaseProcessingError(case.case_id, stage, "response case_id mismatch")
-        if result_order_id != case.order_id:
-            raise CaseProcessingError(case.case_id, stage, "response order_id mismatch")
-
-    @staticmethod
-    def _validate_case_batch(cases: list[CaseInput]) -> None:
-        if not cases:
-            raise ValueError("at least one case is required")
-        case_ids = [case.case_id for case in cases]
-        if len(case_ids) != len(set(case_ids)):
-            raise ValueError("case batch contains duplicate case_id values")
+        financial = payment["financial_resolution"]
+        return {
+            "case_id": case_id,
+            "assessment": {
+                "primary_issue": decision.primary_issue,
+                "case_status": decision.case_status,
+                "confidence": decision.confidence,
+            },
+            "affected_entities": {
+                "order_ids": [order_id],
+                "item_ids": order_seller["item_ids"][:MAX_ENTITY_IDS],
+                "seller_ids": order_seller["seller_ids"][:MAX_ENTITY_IDS],
+                "payment_ids": payment_entity_ids,
+            },
+            "root_cause_analysis": {
+                "ranked_causes": [{"cause_code": decision.root_cause_code, "rank": 1}],
+                "responsible_parties": decision.responsible_parties,
+            },
+            "evidence_ids": evidence_ids,
+            "financial_resolution": {
+                "currency": "BRL",
+                "item_total_brl": financial["item_total_brl"],
+                "freight_total_brl": financial["freight_total_brl"],
+                "payment_total_brl": financial["payment_total_brl"],
+                "recommended_refund_brl": decision.recommended_refund_brl,
+            },
+            "resolution_actions": [decision.action],
+        }
