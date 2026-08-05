@@ -6,20 +6,20 @@
 
 | Thông tin       | Nội dung     |
 | --------------- | ------------ |
-| Họ và tên       | [Họ và tên]  |
-| MSSV            | [MSSV]       |
+| Họ và tên       | Phạm Mai Anh |
+| MSSV            | 2A202601681  |
 | Khóa/Lớp        | [K3]         |
 | Vai trò chính   | [Vai trò]    |
-| Ngày hoàn thành | [YYYY-MM-DD] |
+| Ngày hoàn thành | [2026-08-05] |
 
 ## 2. Vai trò và phạm vi công việc
 
 ### Phần việc sở hữu
 
-| Module/deliverable | File/hàm phụ trách | Input nhận vào | Output bàn giao   | Trạng thái                            |
-| ------------------ | ------------------ | -------------- | ----------------- | ------------------------------------- |
-| [Phần việc]        | [File/hàm]         | [Input]        | [Output/artifact] | [Hoàn thành/Một phần/Chưa hoàn thành] |
-| [Phần việc]        | [File/hàm]         | [Input]        | [Output/artifact] | [Hoàn thành/Một phần/Chưa hoàn thành] |
+| Module/deliverable | File/hàm phụ trách | Input nhận vào | Output bàn giao   | Trạng thái   |
+| ------------------ | ------------------ | -------------- | ----------------- | -------------|
+| [Phần việc]        | [File/hàm]         | [Input]        | [Output/artifact] | [Hoàn thành] |
+| [Phần việc]        | [File/hàm]         | [Input]        | [Output/artifact] | [Hoàn thành] |
 
 Chỉ nhận ownership cho phần bạn trực tiếp thực hiện. Liên hệ rõ phần việc của bạn với đầu vào, đầu ra và các thành viên phụ thuộc vào phần đó.
 
@@ -117,5 +117,5 @@ Giải thích ngắn gọn bằng lời của bạn:
 - [ ] Báo cáo không chứa `.env`, API key, token hoặc secret.
 - [ ] Báo cáo này không phải bản sao nguyên văn của báo cáo nhóm hoặc báo cáo thành viên khác.
 
-**Họ và tên:** [Họ và tên]
-**Ngày xác nhận:** [YYYY-MM-DD]
+**Họ và tên:** Phạm Mai Anh
+**Ngày xác nhận:** [2026-08-05]
