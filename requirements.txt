@@ -1,0 +1,4 @@
+pytest>=8.0
+accelerate>=1.0
+torch>=2.2
+transformers>=4.51.0

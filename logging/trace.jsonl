@@ -1,0 +1,602 @@
+{"ts": "2026-08-05T11:01:42", "event": "run_start", "model": "Qwen/Qwen2.5-1.5B-Instruct", "parameter_size_billion": 1.54, "framework": "transformers", "runtime": "local", "llm_enabled": true, "case_count": 50}
+{"ts": "2026-08-05T11:01:42", "event": "case_start", "case_id": "EC_001", "order_id": "e2a03ccf5ea816036608b2d8c3ab8e60", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:50", "event": "llm_intent", "case_id": "EC_001", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:50", "event": "handoff", "case_id": "EC_001", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "e2a03ccf5ea816036608b2d8c3ab8e60"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_001", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 119.9, "freight_total_brl": 12.04, "late_seller_ids": ["f7496d659ca9fdaf323c0aae84176632"]}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_001", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "e2a03ccf5ea816036608b2d8c3ab8e60", "item_total_brl": 119.9, "freight_total_brl": 12.04}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_001", "agent": "payment_agent", "payload": {"payment_total_brl": 131.94, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_001", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "e2a03ccf5ea816036608b2d8c3ab8e60"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_001", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2017-12-15 18:56:35", "order_estimated_delivery_date": "2017-12-12 00:00:00"}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_001", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_001", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_seller", "root_cause_code": "SELLER_HANDOFF_AFTER_LIMIT", "recommended_refund_brl": 12.04, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:51", "event": "verify", "case_id": "EC_001", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:51", "event": "case_complete", "case_id": "EC_001", "primary_issue": "late_delivery_seller", "recommended_refund_brl": 12.04}
+{"ts": "2026-08-05T11:01:51", "event": "case_start", "case_id": "EC_002", "order_id": "8067c5e4834f3c0a3c8a4e921d65c5b1", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:51", "event": "llm_intent", "case_id": "EC_002", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_002", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "8067c5e4834f3c0a3c8a4e921d65c5b1"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_002", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 163.98, "freight_total_brl": 16.64, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_002", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "8067c5e4834f3c0a3c8a4e921d65c5b1", "item_total_brl": 163.98, "freight_total_brl": 16.64}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_002", "agent": "payment_agent", "payload": {"payment_total_brl": 180.62, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_002", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "8067c5e4834f3c0a3c8a4e921d65c5b1"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_002", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2018-01-31 21:34:47", "order_estimated_delivery_date": "2018-02-09 00:00:00"}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_002", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_002", "agent": "policy_agent", "payload": {"primary_issue": "unsupported_late_claim", "root_cause_code": "DELIVERY_WITHIN_ESTIMATE", "recommended_refund_brl": 0.0, "action": "reject_late_refund"}}
+{"ts": "2026-08-05T11:01:51", "event": "verify", "case_id": "EC_002", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:51", "event": "case_complete", "case_id": "EC_002", "primary_issue": "unsupported_late_claim", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:51", "event": "case_start", "case_id": "EC_003", "order_id": "71303d7e93b399f5bcd537d124c0bcfa", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:51", "event": "llm_intent", "case_id": "EC_003", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_003", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "71303d7e93b399f5bcd537d124c0bcfa"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_003", "agent": "order_seller_agent", "payload": {"order_status": "canceled", "item_total_brl": 100.0, "freight_total_brl": 9.34, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_003", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "71303d7e93b399f5bcd537d124c0bcfa", "item_total_brl": 100.0, "freight_total_brl": 9.34}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_003", "agent": "payment_agent", "payload": {"payment_total_brl": 109.34, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_003", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "71303d7e93b399f5bcd537d124c0bcfa"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_003", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2016-10-25 00:00:00"}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_003", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_003", "agent": "policy_agent", "payload": {"primary_issue": "canceled_order_paid", "root_cause_code": "ORDER_CANCELED_AFTER_PAYMENT", "recommended_refund_brl": 109.34, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:51", "event": "verify", "case_id": "EC_003", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:51", "event": "case_complete", "case_id": "EC_003", "primary_issue": "canceled_order_paid", "recommended_refund_brl": 109.34}
+{"ts": "2026-08-05T11:01:51", "event": "case_start", "case_id": "EC_004", "order_id": "fd28a6dfe413804d0b89b7c9abf5b1f3", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:51", "event": "llm_intent", "case_id": "EC_004", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "split_payment_check"}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_004", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "fd28a6dfe413804d0b89b7c9abf5b1f3"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_004", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 179.9, "freight_total_brl": 32.06, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_004", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "fd28a6dfe413804d0b89b7c9abf5b1f3", "item_total_brl": 179.9, "freight_total_brl": 32.06}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_004", "agent": "payment_agent", "payload": {"payment_total_brl": 211.96, "payment_count": 2, "is_split_payment": true, "reconciled": true}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_004", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "fd28a6dfe413804d0b89b7c9abf5b1f3"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_004", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2018-06-20 13:52:47", "order_estimated_delivery_date": "2018-07-04 00:00:00"}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_004", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_004", "agent": "policy_agent", "payload": {"primary_issue": "valid_split_payment", "root_cause_code": "MULTIPLE_PAYMENTS_RECONCILED", "recommended_refund_brl": 0.0, "action": "explain_valid_split_payment"}}
+{"ts": "2026-08-05T11:01:51", "event": "verify", "case_id": "EC_004", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:51", "event": "case_complete", "case_id": "EC_004", "primary_issue": "valid_split_payment", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:51", "event": "case_start", "case_id": "EC_005", "order_id": "9a31fd9d697e9670777501f720773fd9", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:51", "event": "llm_intent", "case_id": "EC_005", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_005", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "9a31fd9d697e9670777501f720773fd9"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_005", "agent": "order_seller_agent", "payload": {"order_status": "unavailable", "item_total_brl": 0.0, "freight_total_brl": 0.0, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_005", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "9a31fd9d697e9670777501f720773fd9", "item_total_brl": 0.0, "freight_total_brl": 0.0}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_005", "agent": "payment_agent", "payload": {"payment_total_brl": 1191.5, "payment_count": 1, "is_split_payment": false, "reconciled": false}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_005", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "9a31fd9d697e9670777501f720773fd9"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_005", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2018-03-23 00:00:00"}}
+{"ts": "2026-08-05T11:01:51", "event": "handoff", "case_id": "EC_005", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:51", "event": "finding", "case_id": "EC_005", "agent": "policy_agent", "payload": {"primary_issue": "unavailable_order_paid", "root_cause_code": "ORDER_UNAVAILABLE_AFTER_PAYMENT", "recommended_refund_brl": 1191.5, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:51", "event": "verify", "case_id": "EC_005", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:51", "event": "case_complete", "case_id": "EC_005", "primary_issue": "unavailable_order_paid", "recommended_refund_brl": 1191.5}
+{"ts": "2026-08-05T11:01:51", "event": "case_start", "case_id": "EC_006", "order_id": "fe51b7fac3bea42115fa1c3b8973cba7", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:52", "event": "llm_intent", "case_id": "EC_006", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "split_payment_check"}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_006", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "fe51b7fac3bea42115fa1c3b8973cba7"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_006", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 31.9, "freight_total_brl": 12.48, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_006", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "fe51b7fac3bea42115fa1c3b8973cba7", "item_total_brl": 31.9, "freight_total_brl": 12.48}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_006", "agent": "payment_agent", "payload": {"payment_total_brl": 44.38, "payment_count": 2, "is_split_payment": true, "reconciled": true}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_006", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "fe51b7fac3bea42115fa1c3b8973cba7"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_006", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2017-12-18 12:28:57", "order_estimated_delivery_date": "2018-01-15 00:00:00"}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_006", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_006", "agent": "policy_agent", "payload": {"primary_issue": "valid_split_payment", "root_cause_code": "MULTIPLE_PAYMENTS_RECONCILED", "recommended_refund_brl": 0.0, "action": "explain_valid_split_payment"}}
+{"ts": "2026-08-05T11:01:52", "event": "verify", "case_id": "EC_006", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:52", "event": "case_complete", "case_id": "EC_006", "primary_issue": "valid_split_payment", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:52", "event": "case_start", "case_id": "EC_007", "order_id": "ded456690bcb2ffd4def86541479037f", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:52", "event": "llm_intent", "case_id": "EC_007", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_007", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "ded456690bcb2ffd4def86541479037f"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_007", "agent": "order_seller_agent", "payload": {"order_status": "canceled", "item_total_brl": 47.9, "freight_total_brl": 8.5, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_007", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "ded456690bcb2ffd4def86541479037f", "item_total_brl": 47.9, "freight_total_brl": 8.5}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_007", "agent": "payment_agent", "payload": {"payment_total_brl": 56.4, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_007", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "ded456690bcb2ffd4def86541479037f"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_007", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2018-08-29 00:00:00"}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_007", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_007", "agent": "policy_agent", "payload": {"primary_issue": "canceled_order_paid", "root_cause_code": "ORDER_CANCELED_AFTER_PAYMENT", "recommended_refund_brl": 56.4, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:52", "event": "verify", "case_id": "EC_007", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:52", "event": "case_complete", "case_id": "EC_007", "primary_issue": "canceled_order_paid", "recommended_refund_brl": 56.4}
+{"ts": "2026-08-05T11:01:52", "event": "case_start", "case_id": "EC_008", "order_id": "2c0032906c603dcc21cd954828fa77d0", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:52", "event": "llm_intent", "case_id": "EC_008", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_008", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "2c0032906c603dcc21cd954828fa77d0"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_008", "agent": "order_seller_agent", "payload": {"order_status": "canceled", "item_total_brl": 213.75, "freight_total_brl": 36.82, "late_seller_ids": ["c1ed9e3daf6154542826a6996af0fb8c"]}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_008", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "2c0032906c603dcc21cd954828fa77d0", "item_total_brl": 213.75, "freight_total_brl": 36.82}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_008", "agent": "payment_agent", "payload": {"payment_total_brl": 250.57, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_008", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "2c0032906c603dcc21cd954828fa77d0"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_008", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2018-03-12 00:00:00"}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_008", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_008", "agent": "policy_agent", "payload": {"primary_issue": "canceled_order_paid", "root_cause_code": "ORDER_CANCELED_AFTER_PAYMENT", "recommended_refund_brl": 250.57, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:52", "event": "verify", "case_id": "EC_008", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:52", "event": "case_complete", "case_id": "EC_008", "primary_issue": "canceled_order_paid", "recommended_refund_brl": 250.57}
+{"ts": "2026-08-05T11:01:52", "event": "case_start", "case_id": "EC_009", "order_id": "3aaee056441dcae251f360b1c71a7279", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:52", "event": "llm_intent", "case_id": "EC_009", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_009", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "3aaee056441dcae251f360b1c71a7279"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_009", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 122.99, "freight_total_brl": 12.36, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_009", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "3aaee056441dcae251f360b1c71a7279", "item_total_brl": 122.99, "freight_total_brl": 12.36}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_009", "agent": "payment_agent", "payload": {"payment_total_brl": 135.35, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_009", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "3aaee056441dcae251f360b1c71a7279"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_009", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2018-03-21 13:43:25", "order_estimated_delivery_date": "2018-03-09 00:00:00"}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_009", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_009", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_logistics", "root_cause_code": "CARRIER_DELIVERED_AFTER_ESTIMATE", "recommended_refund_brl": 12.36, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:52", "event": "verify", "case_id": "EC_009", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:52", "event": "case_complete", "case_id": "EC_009", "primary_issue": "late_delivery_logistics", "recommended_refund_brl": 12.36}
+{"ts": "2026-08-05T11:01:52", "event": "case_start", "case_id": "EC_010", "order_id": "3a119f52de09d1b2700815732def8b47", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:52", "event": "llm_intent", "case_id": "EC_010", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_010", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "3a119f52de09d1b2700815732def8b47"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_010", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 19.99, "freight_total_brl": 7.78, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_010", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "3a119f52de09d1b2700815732def8b47", "item_total_brl": 19.99, "freight_total_brl": 7.78}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_010", "agent": "payment_agent", "payload": {"payment_total_brl": 27.77, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_010", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "3a119f52de09d1b2700815732def8b47"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_010", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2017-12-16 18:46:40", "order_estimated_delivery_date": "2017-12-08 00:00:00"}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_010", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_010", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_logistics", "root_cause_code": "CARRIER_DELIVERED_AFTER_ESTIMATE", "recommended_refund_brl": 7.78, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:52", "event": "verify", "case_id": "EC_010", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:52", "event": "case_complete", "case_id": "EC_010", "primary_issue": "late_delivery_logistics", "recommended_refund_brl": 7.78}
+{"ts": "2026-08-05T11:01:52", "event": "case_start", "case_id": "EC_011", "order_id": "2636a02ee7de9590df86a4c24b739c49", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:52", "event": "llm_intent", "case_id": "EC_011", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_011", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "2636a02ee7de9590df86a4c24b739c49"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_011", "agent": "order_seller_agent", "payload": {"order_status": "unavailable", "item_total_brl": 0.0, "freight_total_brl": 0.0, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_011", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "2636a02ee7de9590df86a4c24b739c49", "item_total_brl": 0.0, "freight_total_brl": 0.0}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_011", "agent": "payment_agent", "payload": {"payment_total_brl": 142.09, "payment_count": 1, "is_split_payment": false, "reconciled": false}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_011", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "2636a02ee7de9590df86a4c24b739c49"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_011", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2017-07-27 00:00:00"}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_011", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_011", "agent": "policy_agent", "payload": {"primary_issue": "unavailable_order_paid", "root_cause_code": "ORDER_UNAVAILABLE_AFTER_PAYMENT", "recommended_refund_brl": 142.09, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:52", "event": "verify", "case_id": "EC_011", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:52", "event": "case_complete", "case_id": "EC_011", "primary_issue": "unavailable_order_paid", "recommended_refund_brl": 142.09}
+{"ts": "2026-08-05T11:01:52", "event": "case_start", "case_id": "EC_012", "order_id": "103de323ece563a1012b4b6adf5a81b2", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:52", "event": "llm_intent", "case_id": "EC_012", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_012", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "103de323ece563a1012b4b6adf5a81b2"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_012", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 105.0, "freight_total_brl": 9.67, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_012", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "103de323ece563a1012b4b6adf5a81b2", "item_total_brl": 105.0, "freight_total_brl": 9.67}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_012", "agent": "payment_agent", "payload": {"payment_total_brl": 114.67, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_012", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "103de323ece563a1012b4b6adf5a81b2"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_012", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2018-09-03 19:06:55", "order_estimated_delivery_date": "2018-08-23 00:00:00"}}
+{"ts": "2026-08-05T11:01:52", "event": "handoff", "case_id": "EC_012", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:52", "event": "finding", "case_id": "EC_012", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_logistics", "root_cause_code": "CARRIER_DELIVERED_AFTER_ESTIMATE", "recommended_refund_brl": 9.67, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:52", "event": "verify", "case_id": "EC_012", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:52", "event": "case_complete", "case_id": "EC_012", "primary_issue": "late_delivery_logistics", "recommended_refund_brl": 9.67}
+{"ts": "2026-08-05T11:01:52", "event": "case_start", "case_id": "EC_013", "order_id": "ee234bfd26ca588915483995d811c1d0", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:53", "event": "llm_intent", "case_id": "EC_013", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_013", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "ee234bfd26ca588915483995d811c1d0"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_013", "agent": "order_seller_agent", "payload": {"order_status": "unavailable", "item_total_brl": 0.0, "freight_total_brl": 0.0, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_013", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "ee234bfd26ca588915483995d811c1d0", "item_total_brl": 0.0, "freight_total_brl": 0.0}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_013", "agent": "payment_agent", "payload": {"payment_total_brl": 619.86, "payment_count": 1, "is_split_payment": false, "reconciled": false}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_013", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "ee234bfd26ca588915483995d811c1d0"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_013", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2017-12-21 00:00:00"}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_013", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_013", "agent": "policy_agent", "payload": {"primary_issue": "unavailable_order_paid", "root_cause_code": "ORDER_UNAVAILABLE_AFTER_PAYMENT", "recommended_refund_brl": 619.86, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:53", "event": "verify", "case_id": "EC_013", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:53", "event": "case_complete", "case_id": "EC_013", "primary_issue": "unavailable_order_paid", "recommended_refund_brl": 619.86}
+{"ts": "2026-08-05T11:01:53", "event": "case_start", "case_id": "EC_014", "order_id": "b93b079468bdf6a20fd54cf45d1e03b6", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:53", "event": "llm_intent", "case_id": "EC_014", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "split_payment_check"}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_014", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "b93b079468bdf6a20fd54cf45d1e03b6"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_014", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 56.99, "freight_total_brl": 15.15, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_014", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "b93b079468bdf6a20fd54cf45d1e03b6", "item_total_brl": 56.99, "freight_total_brl": 15.15}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_014", "agent": "payment_agent", "payload": {"payment_total_brl": 72.14, "payment_count": 2, "is_split_payment": true, "reconciled": true}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_014", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "b93b079468bdf6a20fd54cf45d1e03b6"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_014", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2017-12-11 21:11:35", "order_estimated_delivery_date": "2017-12-20 00:00:00"}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_014", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_014", "agent": "policy_agent", "payload": {"primary_issue": "valid_split_payment", "root_cause_code": "MULTIPLE_PAYMENTS_RECONCILED", "recommended_refund_brl": 0.0, "action": "explain_valid_split_payment"}}
+{"ts": "2026-08-05T11:01:53", "event": "verify", "case_id": "EC_014", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:53", "event": "case_complete", "case_id": "EC_014", "primary_issue": "valid_split_payment", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:53", "event": "case_start", "case_id": "EC_015", "order_id": "c504f1f5fd54cc8398d57dc0da49de01", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:53", "event": "llm_intent", "case_id": "EC_015", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_015", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "c504f1f5fd54cc8398d57dc0da49de01"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_015", "agent": "order_seller_agent", "payload": {"order_status": "canceled", "item_total_brl": 49.9, "freight_total_brl": 19.59, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_015", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "c504f1f5fd54cc8398d57dc0da49de01", "item_total_brl": 49.9, "freight_total_brl": 19.59}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_015", "agent": "payment_agent", "payload": {"payment_total_brl": 69.49, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_015", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "c504f1f5fd54cc8398d57dc0da49de01"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_015", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2017-08-10 00:00:00"}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_015", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_015", "agent": "policy_agent", "payload": {"primary_issue": "canceled_order_paid", "root_cause_code": "ORDER_CANCELED_AFTER_PAYMENT", "recommended_refund_brl": 69.49, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:53", "event": "verify", "case_id": "EC_015", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:53", "event": "case_complete", "case_id": "EC_015", "primary_issue": "canceled_order_paid", "recommended_refund_brl": 69.49}
+{"ts": "2026-08-05T11:01:53", "event": "case_start", "case_id": "EC_016", "order_id": "a88edef387e2a7e457695664bf0ddfc0", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:53", "event": "llm_intent", "case_id": "EC_016", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_016", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "a88edef387e2a7e457695664bf0ddfc0"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_016", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 38.0, "freight_total_brl": 14.52, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_016", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "a88edef387e2a7e457695664bf0ddfc0", "item_total_brl": 38.0, "freight_total_brl": 14.52}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_016", "agent": "payment_agent", "payload": {"payment_total_brl": 52.52, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_016", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "a88edef387e2a7e457695664bf0ddfc0"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_016", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2017-04-22 09:22:27", "order_estimated_delivery_date": "2017-04-12 00:00:00"}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_016", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_016", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_logistics", "root_cause_code": "CARRIER_DELIVERED_AFTER_ESTIMATE", "recommended_refund_brl": 14.52, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:53", "event": "verify", "case_id": "EC_016", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:53", "event": "case_complete", "case_id": "EC_016", "primary_issue": "late_delivery_logistics", "recommended_refund_brl": 14.52}
+{"ts": "2026-08-05T11:01:53", "event": "case_start", "case_id": "EC_017", "order_id": "dd6ee4d96f0f3cf1432c3b82818e0387", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:53", "event": "llm_intent", "case_id": "EC_017", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_017", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "dd6ee4d96f0f3cf1432c3b82818e0387"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_017", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 60.0, "freight_total_brl": 12.76, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_017", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "dd6ee4d96f0f3cf1432c3b82818e0387", "item_total_brl": 60.0, "freight_total_brl": 12.76}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_017", "agent": "payment_agent", "payload": {"payment_total_brl": 72.76, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_017", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "dd6ee4d96f0f3cf1432c3b82818e0387"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_017", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2017-12-19 14:14:29", "order_estimated_delivery_date": "2017-12-15 00:00:00"}}
+{"ts": "2026-08-05T11:01:53", "event": "handoff", "case_id": "EC_017", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:53", "event": "finding", "case_id": "EC_017", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_logistics", "root_cause_code": "CARRIER_DELIVERED_AFTER_ESTIMATE", "recommended_refund_brl": 12.76, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:53", "event": "verify", "case_id": "EC_017", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:53", "event": "case_complete", "case_id": "EC_017", "primary_issue": "late_delivery_logistics", "recommended_refund_brl": 12.76}
+{"ts": "2026-08-05T11:01:53", "event": "case_start", "case_id": "EC_018", "order_id": "97c8513f2504aa8ec05534307a703dea", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:54", "event": "llm_intent", "case_id": "EC_018", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "split_payment_check"}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_018", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "97c8513f2504aa8ec05534307a703dea"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_018", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 19.9, "freight_total_brl": 7.78, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_018", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "97c8513f2504aa8ec05534307a703dea", "item_total_brl": 19.9, "freight_total_brl": 7.78}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_018", "agent": "payment_agent", "payload": {"payment_total_brl": 27.68, "payment_count": 2, "is_split_payment": true, "reconciled": true}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_018", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "97c8513f2504aa8ec05534307a703dea"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_018", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2017-11-08 15:41:10", "order_estimated_delivery_date": "2017-11-16 00:00:00"}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_018", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_018", "agent": "policy_agent", "payload": {"primary_issue": "valid_split_payment", "root_cause_code": "MULTIPLE_PAYMENTS_RECONCILED", "recommended_refund_brl": 0.0, "action": "explain_valid_split_payment"}}
+{"ts": "2026-08-05T11:01:54", "event": "verify", "case_id": "EC_018", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:54", "event": "case_complete", "case_id": "EC_018", "primary_issue": "valid_split_payment", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:54", "event": "case_start", "case_id": "EC_019", "order_id": "31f935babbc97f5990e0ffd128e19541", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:54", "event": "llm_intent", "case_id": "EC_019", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_019", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "31f935babbc97f5990e0ffd128e19541"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_019", "agent": "order_seller_agent", "payload": {"order_status": "unavailable", "item_total_brl": 0.0, "freight_total_brl": 0.0, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_019", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "31f935babbc97f5990e0ffd128e19541", "item_total_brl": 0.0, "freight_total_brl": 0.0}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_019", "agent": "payment_agent", "payload": {"payment_total_brl": 74.7, "payment_count": 1, "is_split_payment": false, "reconciled": false}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_019", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "31f935babbc97f5990e0ffd128e19541"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_019", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2017-12-08 00:00:00"}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_019", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_019", "agent": "policy_agent", "payload": {"primary_issue": "unavailable_order_paid", "root_cause_code": "ORDER_UNAVAILABLE_AFTER_PAYMENT", "recommended_refund_brl": 74.7, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:54", "event": "verify", "case_id": "EC_019", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:54", "event": "case_complete", "case_id": "EC_019", "primary_issue": "unavailable_order_paid", "recommended_refund_brl": 74.7}
+{"ts": "2026-08-05T11:01:54", "event": "case_start", "case_id": "EC_020", "order_id": "96087ef44ca9abdbc4c372a3dd3c859f", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:54", "event": "llm_intent", "case_id": "EC_020", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "split_payment_check"}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_020", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "96087ef44ca9abdbc4c372a3dd3c859f"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_020", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 260.0, "freight_total_brl": 9.08, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_020", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "96087ef44ca9abdbc4c372a3dd3c859f", "item_total_brl": 260.0, "freight_total_brl": 9.08}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_020", "agent": "payment_agent", "payload": {"payment_total_brl": 269.08, "payment_count": 2, "is_split_payment": true, "reconciled": true}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_020", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "96087ef44ca9abdbc4c372a3dd3c859f"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_020", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2017-11-21 19:11:35", "order_estimated_delivery_date": "2017-12-01 00:00:00"}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_020", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_020", "agent": "policy_agent", "payload": {"primary_issue": "valid_split_payment", "root_cause_code": "MULTIPLE_PAYMENTS_RECONCILED", "recommended_refund_brl": 0.0, "action": "explain_valid_split_payment"}}
+{"ts": "2026-08-05T11:01:54", "event": "verify", "case_id": "EC_020", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:54", "event": "case_complete", "case_id": "EC_020", "primary_issue": "valid_split_payment", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:54", "event": "case_start", "case_id": "EC_021", "order_id": "13d341318c77969f10d77e1382957542", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:54", "event": "llm_intent", "case_id": "EC_021", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_021", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "13d341318c77969f10d77e1382957542"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_021", "agent": "order_seller_agent", "payload": {"order_status": "canceled", "item_total_brl": 29.9, "freight_total_brl": 8.96, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_021", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "13d341318c77969f10d77e1382957542", "item_total_brl": 29.9, "freight_total_brl": 8.96}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_021", "agent": "payment_agent", "payload": {"payment_total_brl": 38.86, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_021", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "13d341318c77969f10d77e1382957542"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_021", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2018-08-08 00:00:00"}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_021", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_021", "agent": "policy_agent", "payload": {"primary_issue": "canceled_order_paid", "root_cause_code": "ORDER_CANCELED_AFTER_PAYMENT", "recommended_refund_brl": 38.86, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:54", "event": "verify", "case_id": "EC_021", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:54", "event": "case_complete", "case_id": "EC_021", "primary_issue": "canceled_order_paid", "recommended_refund_brl": 38.86}
+{"ts": "2026-08-05T11:01:54", "event": "case_start", "case_id": "EC_022", "order_id": "1f7565efbb90c33b80f467d6a75332c5", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:54", "event": "llm_intent", "case_id": "EC_022", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_022", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "1f7565efbb90c33b80f467d6a75332c5"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_022", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 249.0, "freight_total_brl": 19.98, "late_seller_ids": ["02d35243ea2e497335cd0f076b45675d"]}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_022", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "1f7565efbb90c33b80f467d6a75332c5", "item_total_brl": 249.0, "freight_total_brl": 19.98}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_022", "agent": "payment_agent", "payload": {"payment_total_brl": 268.98, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_022", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "1f7565efbb90c33b80f467d6a75332c5"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_022", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2017-09-20 19:05:33", "order_estimated_delivery_date": "2017-09-15 00:00:00"}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_022", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_022", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_seller", "root_cause_code": "SELLER_HANDOFF_AFTER_LIMIT", "recommended_refund_brl": 19.98, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:54", "event": "verify", "case_id": "EC_022", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:54", "event": "case_complete", "case_id": "EC_022", "primary_issue": "late_delivery_seller", "recommended_refund_brl": 19.98}
+{"ts": "2026-08-05T11:01:54", "event": "case_start", "case_id": "EC_023", "order_id": "5fba7c57daf631028d2a584c52799e24", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:54", "event": "llm_intent", "case_id": "EC_023", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_023", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "5fba7c57daf631028d2a584c52799e24"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_023", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 59.9, "freight_total_brl": 13.44, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_023", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "5fba7c57daf631028d2a584c52799e24", "item_total_brl": 59.9, "freight_total_brl": 13.44}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_023", "agent": "payment_agent", "payload": {"payment_total_brl": 73.34, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_023", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "5fba7c57daf631028d2a584c52799e24"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_023", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2017-08-15 20:18:43", "order_estimated_delivery_date": "2017-08-31 00:00:00"}}
+{"ts": "2026-08-05T11:01:54", "event": "handoff", "case_id": "EC_023", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:54", "event": "finding", "case_id": "EC_023", "agent": "policy_agent", "payload": {"primary_issue": "unsupported_late_claim", "root_cause_code": "DELIVERY_WITHIN_ESTIMATE", "recommended_refund_brl": 0.0, "action": "reject_late_refund"}}
+{"ts": "2026-08-05T11:01:54", "event": "verify", "case_id": "EC_023", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:54", "event": "case_complete", "case_id": "EC_023", "primary_issue": "unsupported_late_claim", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:54", "event": "case_start", "case_id": "EC_024", "order_id": "d8716a985f69a46751cc046b0fea0d98", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:55", "event": "llm_intent", "case_id": "EC_024", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_024", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "d8716a985f69a46751cc046b0fea0d98"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_024", "agent": "order_seller_agent", "payload": {"order_status": "unavailable", "item_total_brl": 0.0, "freight_total_brl": 0.0, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_024", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "d8716a985f69a46751cc046b0fea0d98", "item_total_brl": 0.0, "freight_total_brl": 0.0}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_024", "agent": "payment_agent", "payload": {"payment_total_brl": 87.08, "payment_count": 1, "is_split_payment": false, "reconciled": false}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_024", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "d8716a985f69a46751cc046b0fea0d98"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_024", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2017-10-24 00:00:00"}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_024", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_024", "agent": "policy_agent", "payload": {"primary_issue": "unavailable_order_paid", "root_cause_code": "ORDER_UNAVAILABLE_AFTER_PAYMENT", "recommended_refund_brl": 87.08, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:55", "event": "verify", "case_id": "EC_024", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:55", "event": "case_complete", "case_id": "EC_024", "primary_issue": "unavailable_order_paid", "recommended_refund_brl": 87.08}
+{"ts": "2026-08-05T11:01:55", "event": "case_start", "case_id": "EC_025", "order_id": "e06ff711ddcab05c3651a9b1bb003950", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:55", "event": "llm_intent", "case_id": "EC_025", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "split_payment_check"}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_025", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "e06ff711ddcab05c3651a9b1bb003950"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_025", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 133.05, "freight_total_brl": 51.27, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_025", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "e06ff711ddcab05c3651a9b1bb003950", "item_total_brl": 133.05, "freight_total_brl": 51.27}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_025", "agent": "payment_agent", "payload": {"payment_total_brl": 184.32, "payment_count": 2, "is_split_payment": true, "reconciled": true}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_025", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "e06ff711ddcab05c3651a9b1bb003950"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_025", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2017-03-14 15:47:49", "order_estimated_delivery_date": "2017-03-23 00:00:00"}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_025", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_025", "agent": "policy_agent", "payload": {"primary_issue": "valid_split_payment", "root_cause_code": "MULTIPLE_PAYMENTS_RECONCILED", "recommended_refund_brl": 0.0, "action": "explain_valid_split_payment"}}
+{"ts": "2026-08-05T11:01:55", "event": "verify", "case_id": "EC_025", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:55", "event": "case_complete", "case_id": "EC_025", "primary_issue": "valid_split_payment", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:55", "event": "case_start", "case_id": "EC_026", "order_id": "966f96af9d189dc428ff04ebbca821b8", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:55", "event": "llm_intent", "case_id": "EC_026", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_026", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "966f96af9d189dc428ff04ebbca821b8"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_026", "agent": "order_seller_agent", "payload": {"order_status": "canceled", "item_total_brl": 129.9, "freight_total_brl": 12.44, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_026", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "966f96af9d189dc428ff04ebbca821b8", "item_total_brl": 129.9, "freight_total_brl": 12.44}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_026", "agent": "payment_agent", "payload": {"payment_total_brl": 142.34, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_026", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "966f96af9d189dc428ff04ebbca821b8"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_026", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2016-11-24 00:00:00"}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_026", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_026", "agent": "policy_agent", "payload": {"primary_issue": "canceled_order_paid", "root_cause_code": "ORDER_CANCELED_AFTER_PAYMENT", "recommended_refund_brl": 142.34, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:55", "event": "verify", "case_id": "EC_026", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:55", "event": "case_complete", "case_id": "EC_026", "primary_issue": "canceled_order_paid", "recommended_refund_brl": 142.34}
+{"ts": "2026-08-05T11:01:55", "event": "case_start", "case_id": "EC_027", "order_id": "2f346d92b11fcc7c342b3392b174cf3b", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:55", "event": "llm_intent", "case_id": "EC_027", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_027", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "2f346d92b11fcc7c342b3392b174cf3b"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_027", "agent": "order_seller_agent", "payload": {"order_status": "unavailable", "item_total_brl": 0.0, "freight_total_brl": 0.0, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_027", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "2f346d92b11fcc7c342b3392b174cf3b", "item_total_brl": 0.0, "freight_total_brl": 0.0}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_027", "agent": "payment_agent", "payload": {"payment_total_brl": 74.7, "payment_count": 1, "is_split_payment": false, "reconciled": false}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_027", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "2f346d92b11fcc7c342b3392b174cf3b"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_027", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2018-01-08 00:00:00"}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_027", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_027", "agent": "policy_agent", "payload": {"primary_issue": "unavailable_order_paid", "root_cause_code": "ORDER_UNAVAILABLE_AFTER_PAYMENT", "recommended_refund_brl": 74.7, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:55", "event": "verify", "case_id": "EC_027", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:55", "event": "case_complete", "case_id": "EC_027", "primary_issue": "unavailable_order_paid", "recommended_refund_brl": 74.7}
+{"ts": "2026-08-05T11:01:55", "event": "case_start", "case_id": "EC_028", "order_id": "80f0181edc2f4a5bd3384a3c39a83cee", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:55", "event": "llm_intent", "case_id": "EC_028", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_028", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "80f0181edc2f4a5bd3384a3c39a83cee"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_028", "agent": "order_seller_agent", "payload": {"order_status": "unavailable", "item_total_brl": 0.0, "freight_total_brl": 0.0, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_028", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "80f0181edc2f4a5bd3384a3c39a83cee", "item_total_brl": 0.0, "freight_total_brl": 0.0}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_028", "agent": "payment_agent", "payload": {"payment_total_brl": 61.19, "payment_count": 1, "is_split_payment": false, "reconciled": false}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_028", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "80f0181edc2f4a5bd3384a3c39a83cee"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_028", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2018-01-30 00:00:00"}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_028", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_028", "agent": "policy_agent", "payload": {"primary_issue": "unavailable_order_paid", "root_cause_code": "ORDER_UNAVAILABLE_AFTER_PAYMENT", "recommended_refund_brl": 61.19, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:55", "event": "verify", "case_id": "EC_028", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:55", "event": "case_complete", "case_id": "EC_028", "primary_issue": "unavailable_order_paid", "recommended_refund_brl": 61.19}
+{"ts": "2026-08-05T11:01:55", "event": "case_start", "case_id": "EC_029", "order_id": "5c932e0a181410b67c77daaed30991af", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:55", "event": "llm_intent", "case_id": "EC_029", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_029", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "5c932e0a181410b67c77daaed30991af"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_029", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 449.7, "freight_total_brl": 42.51, "late_seller_ids": ["88460e8ebdecbfecb5f9601833981930"]}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_029", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "5c932e0a181410b67c77daaed30991af", "item_total_brl": 449.7, "freight_total_brl": 42.51}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_029", "agent": "payment_agent", "payload": {"payment_total_brl": 492.21, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_029", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "5c932e0a181410b67c77daaed30991af"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_029", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2018-03-29 18:12:36", "order_estimated_delivery_date": "2018-03-27 00:00:00"}}
+{"ts": "2026-08-05T11:01:55", "event": "handoff", "case_id": "EC_029", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:55", "event": "finding", "case_id": "EC_029", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_seller", "root_cause_code": "SELLER_HANDOFF_AFTER_LIMIT", "recommended_refund_brl": 42.51, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:55", "event": "verify", "case_id": "EC_029", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:55", "event": "case_complete", "case_id": "EC_029", "primary_issue": "late_delivery_seller", "recommended_refund_brl": 42.51}
+{"ts": "2026-08-05T11:01:55", "event": "case_start", "case_id": "EC_030", "order_id": "405be8487a7fde1db0bc31ad6b08050a", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:56", "event": "llm_intent", "case_id": "EC_030", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "split_payment_check"}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_030", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "405be8487a7fde1db0bc31ad6b08050a"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_030", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 15.9, "freight_total_brl": 9.94, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_030", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "405be8487a7fde1db0bc31ad6b08050a", "item_total_brl": 15.9, "freight_total_brl": 9.94}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_030", "agent": "payment_agent", "payload": {"payment_total_brl": 25.84, "payment_count": 3, "is_split_payment": true, "reconciled": true}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_030", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "405be8487a7fde1db0bc31ad6b08050a"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_030", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2017-09-06 20:26:31", "order_estimated_delivery_date": "2017-09-15 00:00:00"}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_030", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_030", "agent": "policy_agent", "payload": {"primary_issue": "valid_split_payment", "root_cause_code": "MULTIPLE_PAYMENTS_RECONCILED", "recommended_refund_brl": 0.0, "action": "explain_valid_split_payment"}}
+{"ts": "2026-08-05T11:01:56", "event": "verify", "case_id": "EC_030", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:56", "event": "case_complete", "case_id": "EC_030", "primary_issue": "valid_split_payment", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:56", "event": "case_start", "case_id": "EC_031", "order_id": "4274ff4a5df607e75b32b80e2f8eda3f", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:56", "event": "llm_intent", "case_id": "EC_031", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_031", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "4274ff4a5df607e75b32b80e2f8eda3f"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_031", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 82.0, "freight_total_brl": 7.44, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_031", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "4274ff4a5df607e75b32b80e2f8eda3f", "item_total_brl": 82.0, "freight_total_brl": 7.44}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_031", "agent": "payment_agent", "payload": {"payment_total_brl": 89.44, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_031", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "4274ff4a5df607e75b32b80e2f8eda3f"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_031", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2018-05-10 19:36:52", "order_estimated_delivery_date": "2018-05-08 00:00:00"}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_031", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_031", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_logistics", "root_cause_code": "CARRIER_DELIVERED_AFTER_ESTIMATE", "recommended_refund_brl": 7.44, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:56", "event": "verify", "case_id": "EC_031", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:56", "event": "case_complete", "case_id": "EC_031", "primary_issue": "late_delivery_logistics", "recommended_refund_brl": 7.44}
+{"ts": "2026-08-05T11:01:56", "event": "case_start", "case_id": "EC_032", "order_id": "c4dad201936ed30eef3c94fafa59ed6e", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:56", "event": "llm_intent", "case_id": "EC_032", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_032", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "c4dad201936ed30eef3c94fafa59ed6e"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_032", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 238.0, "freight_total_brl": 29.66, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_032", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "c4dad201936ed30eef3c94fafa59ed6e", "item_total_brl": 238.0, "freight_total_brl": 29.66}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_032", "agent": "payment_agent", "payload": {"payment_total_brl": 267.66, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_032", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "c4dad201936ed30eef3c94fafa59ed6e"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_032", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2018-05-25 17:42:25", "order_estimated_delivery_date": "2018-06-13 00:00:00"}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_032", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_032", "agent": "policy_agent", "payload": {"primary_issue": "unsupported_late_claim", "root_cause_code": "DELIVERY_WITHIN_ESTIMATE", "recommended_refund_brl": 0.0, "action": "reject_late_refund"}}
+{"ts": "2026-08-05T11:01:56", "event": "verify", "case_id": "EC_032", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:56", "event": "case_complete", "case_id": "EC_032", "primary_issue": "unsupported_late_claim", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:56", "event": "case_start", "case_id": "EC_033", "order_id": "a5c8f3a11dcb9bd9b0acdfb8101dfdc8", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:56", "event": "llm_intent", "case_id": "EC_033", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_033", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "a5c8f3a11dcb9bd9b0acdfb8101dfdc8"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_033", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 120.0, "freight_total_brl": 18.72, "late_seller_ids": ["1025f0e2d44d7041d6cf58b6550e0bfa"]}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_033", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "a5c8f3a11dcb9bd9b0acdfb8101dfdc8", "item_total_brl": 120.0, "freight_total_brl": 18.72}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_033", "agent": "payment_agent", "payload": {"payment_total_brl": 138.72, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_033", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "a5c8f3a11dcb9bd9b0acdfb8101dfdc8"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_033", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2018-06-12 22:50:41", "order_estimated_delivery_date": "2018-06-05 00:00:00"}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_033", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_033", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_seller", "root_cause_code": "SELLER_HANDOFF_AFTER_LIMIT", "recommended_refund_brl": 18.72, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:56", "event": "verify", "case_id": "EC_033", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:56", "event": "case_complete", "case_id": "EC_033", "primary_issue": "late_delivery_seller", "recommended_refund_brl": 18.72}
+{"ts": "2026-08-05T11:01:56", "event": "case_start", "case_id": "EC_034", "order_id": "973acef56bf70feefa8264d4e9f300fc", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:56", "event": "llm_intent", "case_id": "EC_034", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_034", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "973acef56bf70feefa8264d4e9f300fc"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_034", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 110.0, "freight_total_brl": 36.43, "late_seller_ids": ["66922902710d126a0e7d26b0e3805106"]}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_034", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "973acef56bf70feefa8264d4e9f300fc", "item_total_brl": 110.0, "freight_total_brl": 36.43}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_034", "agent": "payment_agent", "payload": {"payment_total_brl": 146.43, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_034", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "973acef56bf70feefa8264d4e9f300fc"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_034", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2018-01-03 18:17:36", "order_estimated_delivery_date": "2017-12-28 00:00:00"}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_034", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_034", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_seller", "root_cause_code": "SELLER_HANDOFF_AFTER_LIMIT", "recommended_refund_brl": 36.43, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:56", "event": "verify", "case_id": "EC_034", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:56", "event": "case_complete", "case_id": "EC_034", "primary_issue": "late_delivery_seller", "recommended_refund_brl": 36.43}
+{"ts": "2026-08-05T11:01:56", "event": "case_start", "case_id": "EC_035", "order_id": "2478ddd1d1395639b71cf0d498d8dbf6", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:56", "event": "llm_intent", "case_id": "EC_035", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_035", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "2478ddd1d1395639b71cf0d498d8dbf6"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_035", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 30.0, "freight_total_brl": 11.85, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_035", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "2478ddd1d1395639b71cf0d498d8dbf6", "item_total_brl": 30.0, "freight_total_brl": 11.85}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_035", "agent": "payment_agent", "payload": {"payment_total_brl": 41.85, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_035", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "2478ddd1d1395639b71cf0d498d8dbf6"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_035", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2017-08-21 18:47:38", "order_estimated_delivery_date": "2017-09-01 00:00:00"}}
+{"ts": "2026-08-05T11:01:56", "event": "handoff", "case_id": "EC_035", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:56", "event": "finding", "case_id": "EC_035", "agent": "policy_agent", "payload": {"primary_issue": "unsupported_late_claim", "root_cause_code": "DELIVERY_WITHIN_ESTIMATE", "recommended_refund_brl": 0.0, "action": "reject_late_refund"}}
+{"ts": "2026-08-05T11:01:56", "event": "verify", "case_id": "EC_035", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:56", "event": "case_complete", "case_id": "EC_035", "primary_issue": "unsupported_late_claim", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:56", "event": "case_start", "case_id": "EC_036", "order_id": "c609f82bcf7a90292a5940205ebd7e93", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:57", "event": "llm_intent", "case_id": "EC_036", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_036", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "c609f82bcf7a90292a5940205ebd7e93"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_036", "agent": "order_seller_agent", "payload": {"order_status": "unavailable", "item_total_brl": 0.0, "freight_total_brl": 0.0, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_036", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "c609f82bcf7a90292a5940205ebd7e93", "item_total_brl": 0.0, "freight_total_brl": 0.0}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_036", "agent": "payment_agent", "payload": {"payment_total_brl": 117.78, "payment_count": 1, "is_split_payment": false, "reconciled": false}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_036", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "c609f82bcf7a90292a5940205ebd7e93"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_036", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2018-06-05 00:00:00"}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_036", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_036", "agent": "policy_agent", "payload": {"primary_issue": "unavailable_order_paid", "root_cause_code": "ORDER_UNAVAILABLE_AFTER_PAYMENT", "recommended_refund_brl": 117.78, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:57", "event": "verify", "case_id": "EC_036", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:57", "event": "case_complete", "case_id": "EC_036", "primary_issue": "unavailable_order_paid", "recommended_refund_brl": 117.78}
+{"ts": "2026-08-05T11:01:57", "event": "case_start", "case_id": "EC_037", "order_id": "b90e46cdc30adec2f0fa041984341170", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:57", "event": "llm_intent", "case_id": "EC_037", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_037", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "b90e46cdc30adec2f0fa041984341170"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_037", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 149.0, "freight_total_brl": 14.79, "late_seller_ids": ["1ca7077d890b907f89be8c954a02686a"]}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_037", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "b90e46cdc30adec2f0fa041984341170", "item_total_brl": 149.0, "freight_total_brl": 14.79}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_037", "agent": "payment_agent", "payload": {"payment_total_brl": 163.79, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_037", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "b90e46cdc30adec2f0fa041984341170"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_037", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2018-01-26 20:58:42", "order_estimated_delivery_date": "2018-01-22 00:00:00"}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_037", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_037", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_seller", "root_cause_code": "SELLER_HANDOFF_AFTER_LIMIT", "recommended_refund_brl": 14.79, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:57", "event": "verify", "case_id": "EC_037", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:57", "event": "case_complete", "case_id": "EC_037", "primary_issue": "late_delivery_seller", "recommended_refund_brl": 14.79}
+{"ts": "2026-08-05T11:01:57", "event": "case_start", "case_id": "EC_038", "order_id": "6b27933c6a46e3d66203137ad1fdb678", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:57", "event": "llm_intent", "case_id": "EC_038", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "split_payment_check"}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_038", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "6b27933c6a46e3d66203137ad1fdb678"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_038", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 189.99, "freight_total_brl": 15.27, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_038", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "6b27933c6a46e3d66203137ad1fdb678", "item_total_brl": 189.99, "freight_total_brl": 15.27}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_038", "agent": "payment_agent", "payload": {"payment_total_brl": 205.26, "payment_count": 2, "is_split_payment": true, "reconciled": true}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_038", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "6b27933c6a46e3d66203137ad1fdb678"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_038", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2018-05-22 17:33:12", "order_estimated_delivery_date": "2018-06-06 00:00:00"}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_038", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_038", "agent": "policy_agent", "payload": {"primary_issue": "valid_split_payment", "root_cause_code": "MULTIPLE_PAYMENTS_RECONCILED", "recommended_refund_brl": 0.0, "action": "explain_valid_split_payment"}}
+{"ts": "2026-08-05T11:01:57", "event": "verify", "case_id": "EC_038", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:57", "event": "case_complete", "case_id": "EC_038", "primary_issue": "valid_split_payment", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:57", "event": "case_start", "case_id": "EC_039", "order_id": "44a03ff139461361ec4cce7949663c2f", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:57", "event": "llm_intent", "case_id": "EC_039", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_039", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "44a03ff139461361ec4cce7949663c2f"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_039", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 79.9, "freight_total_brl": 9.29, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_039", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "44a03ff139461361ec4cce7949663c2f", "item_total_brl": 79.9, "freight_total_brl": 9.29}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_039", "agent": "payment_agent", "payload": {"payment_total_brl": 89.19, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_039", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "44a03ff139461361ec4cce7949663c2f"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_039", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2018-06-04 12:14:43", "order_estimated_delivery_date": "2018-06-08 00:00:00"}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_039", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_039", "agent": "policy_agent", "payload": {"primary_issue": "unsupported_late_claim", "root_cause_code": "DELIVERY_WITHIN_ESTIMATE", "recommended_refund_brl": 0.0, "action": "reject_late_refund"}}
+{"ts": "2026-08-05T11:01:57", "event": "verify", "case_id": "EC_039", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:57", "event": "case_complete", "case_id": "EC_039", "primary_issue": "unsupported_late_claim", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:57", "event": "case_start", "case_id": "EC_040", "order_id": "11bc240af3d9e1f77218715480a65b77", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:57", "event": "llm_intent", "case_id": "EC_040", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_040", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "11bc240af3d9e1f77218715480a65b77"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_040", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 248.0, "freight_total_brl": 9.93, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_040", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "11bc240af3d9e1f77218715480a65b77", "item_total_brl": 248.0, "freight_total_brl": 9.93}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_040", "agent": "payment_agent", "payload": {"payment_total_brl": 257.93, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_040", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "11bc240af3d9e1f77218715480a65b77"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_040", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2017-06-07 15:57:52", "order_estimated_delivery_date": "2017-06-19 00:00:00"}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_040", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_040", "agent": "policy_agent", "payload": {"primary_issue": "unsupported_late_claim", "root_cause_code": "DELIVERY_WITHIN_ESTIMATE", "recommended_refund_brl": 0.0, "action": "reject_late_refund"}}
+{"ts": "2026-08-05T11:01:57", "event": "verify", "case_id": "EC_040", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:57", "event": "case_complete", "case_id": "EC_040", "primary_issue": "unsupported_late_claim", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:57", "event": "case_start", "case_id": "EC_041", "order_id": "64a8b3b4c19751b51d211deb32fdc67b", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:57", "event": "llm_intent", "case_id": "EC_041", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_041", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "64a8b3b4c19751b51d211deb32fdc67b"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_041", "agent": "order_seller_agent", "payload": {"order_status": "canceled", "item_total_brl": 44.9, "freight_total_brl": 8.29, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_041", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "64a8b3b4c19751b51d211deb32fdc67b", "item_total_brl": 44.9, "freight_total_brl": 8.29}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_041", "agent": "payment_agent", "payload": {"payment_total_brl": 53.19, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_041", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "64a8b3b4c19751b51d211deb32fdc67b"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_041", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2018-05-28 00:00:00"}}
+{"ts": "2026-08-05T11:01:57", "event": "handoff", "case_id": "EC_041", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:57", "event": "finding", "case_id": "EC_041", "agent": "policy_agent", "payload": {"primary_issue": "canceled_order_paid", "root_cause_code": "ORDER_CANCELED_AFTER_PAYMENT", "recommended_refund_brl": 53.19, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:57", "event": "verify", "case_id": "EC_041", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:57", "event": "case_complete", "case_id": "EC_041", "primary_issue": "canceled_order_paid", "recommended_refund_brl": 53.19}
+{"ts": "2026-08-05T11:01:57", "event": "case_start", "case_id": "EC_042", "order_id": "8a5fc33c79bf3f4d9bbcc3dceb6b67c4", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:58", "event": "llm_intent", "case_id": "EC_042", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_042", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "8a5fc33c79bf3f4d9bbcc3dceb6b67c4"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_042", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 231.2, "freight_total_brl": 38.53, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_042", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "8a5fc33c79bf3f4d9bbcc3dceb6b67c4", "item_total_brl": 231.2, "freight_total_brl": 38.53}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_042", "agent": "payment_agent", "payload": {"payment_total_brl": 269.73, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_042", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "8a5fc33c79bf3f4d9bbcc3dceb6b67c4"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_042", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2018-08-18 12:36:48", "order_estimated_delivery_date": "2018-08-23 00:00:00"}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_042", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_042", "agent": "policy_agent", "payload": {"primary_issue": "unsupported_late_claim", "root_cause_code": "DELIVERY_WITHIN_ESTIMATE", "recommended_refund_brl": 0.0, "action": "reject_late_refund"}}
+{"ts": "2026-08-05T11:01:58", "event": "verify", "case_id": "EC_042", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:58", "event": "case_complete", "case_id": "EC_042", "primary_issue": "unsupported_late_claim", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:58", "event": "case_start", "case_id": "EC_043", "order_id": "3ef6bcdda6193f8657168ba7e8b3e948", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:58", "event": "llm_intent", "case_id": "EC_043", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_043", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "3ef6bcdda6193f8657168ba7e8b3e948"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_043", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 199.99, "freight_total_brl": 17.97, "late_seller_ids": ["46dc3b2cc0980fb8ec44634e21d2718e"]}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_043", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "3ef6bcdda6193f8657168ba7e8b3e948", "item_total_brl": 199.99, "freight_total_brl": 17.97}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_043", "agent": "payment_agent", "payload": {"payment_total_brl": 217.96, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_043", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "3ef6bcdda6193f8657168ba7e8b3e948"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_043", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2017-12-11 20:38:51", "order_estimated_delivery_date": "2017-12-05 00:00:00"}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_043", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_043", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_seller", "root_cause_code": "SELLER_HANDOFF_AFTER_LIMIT", "recommended_refund_brl": 17.97, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:58", "event": "verify", "case_id": "EC_043", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:58", "event": "case_complete", "case_id": "EC_043", "primary_issue": "late_delivery_seller", "recommended_refund_brl": 17.97}
+{"ts": "2026-08-05T11:01:58", "event": "case_start", "case_id": "EC_044", "order_id": "d671370d11048a2dab56335d3d91823e", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:58", "event": "llm_intent", "case_id": "EC_044", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_044", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "d671370d11048a2dab56335d3d91823e"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_044", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 37.0, "freight_total_brl": 15.1, "late_seller_ids": ["4a3ca9315b744ce9f8e9374361493884"]}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_044", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "d671370d11048a2dab56335d3d91823e", "item_total_brl": 37.0, "freight_total_brl": 15.1}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_044", "agent": "payment_agent", "payload": {"payment_total_brl": 52.1, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_044", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "d671370d11048a2dab56335d3d91823e"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_044", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2017-12-29 20:18:52", "order_estimated_delivery_date": "2017-12-19 00:00:00"}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_044", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_044", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_seller", "root_cause_code": "SELLER_HANDOFF_AFTER_LIMIT", "recommended_refund_brl": 15.1, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:58", "event": "verify", "case_id": "EC_044", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:58", "event": "case_complete", "case_id": "EC_044", "primary_issue": "late_delivery_seller", "recommended_refund_brl": 15.1}
+{"ts": "2026-08-05T11:01:58", "event": "case_start", "case_id": "EC_045", "order_id": "d67b79fea59821fda4d363d337a56c3a", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:58", "event": "llm_intent", "case_id": "EC_045", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "other"}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_045", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "d67b79fea59821fda4d363d337a56c3a"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_045", "agent": "order_seller_agent", "payload": {"order_status": "canceled", "item_total_brl": 59.9, "freight_total_brl": 9.17, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_045", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "d67b79fea59821fda4d363d337a56c3a", "item_total_brl": 59.9, "freight_total_brl": 9.17}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_045", "agent": "payment_agent", "payload": {"payment_total_brl": 69.07, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_045", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "d67b79fea59821fda4d363d337a56c3a"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_045", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": null, "order_delivered_customer_date": null, "order_estimated_delivery_date": "2018-08-20 00:00:00"}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_045", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_045", "agent": "policy_agent", "payload": {"primary_issue": "canceled_order_paid", "root_cause_code": "ORDER_CANCELED_AFTER_PAYMENT", "recommended_refund_brl": 69.07, "action": "issue_full_refund"}}
+{"ts": "2026-08-05T11:01:58", "event": "verify", "case_id": "EC_045", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:58", "event": "case_complete", "case_id": "EC_045", "primary_issue": "canceled_order_paid", "recommended_refund_brl": 69.07}
+{"ts": "2026-08-05T11:01:58", "event": "case_start", "case_id": "EC_046", "order_id": "2208f3a59d7067fe62c900692f5fdcaf", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:58", "event": "llm_intent", "case_id": "EC_046", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "split_payment_check"}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_046", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "2208f3a59d7067fe62c900692f5fdcaf"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_046", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 99.0, "freight_total_brl": 27.01, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_046", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "2208f3a59d7067fe62c900692f5fdcaf", "item_total_brl": 99.0, "freight_total_brl": 27.01}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_046", "agent": "payment_agent", "payload": {"payment_total_brl": 126.01, "payment_count": 2, "is_split_payment": true, "reconciled": true}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_046", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "2208f3a59d7067fe62c900692f5fdcaf"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_046", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2018-02-16 18:18:58", "order_estimated_delivery_date": "2018-03-05 00:00:00"}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_046", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_046", "agent": "policy_agent", "payload": {"primary_issue": "valid_split_payment", "root_cause_code": "MULTIPLE_PAYMENTS_RECONCILED", "recommended_refund_brl": 0.0, "action": "explain_valid_split_payment"}}
+{"ts": "2026-08-05T11:01:58", "event": "verify", "case_id": "EC_046", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:58", "event": "case_complete", "case_id": "EC_046", "primary_issue": "valid_split_payment", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:58", "event": "case_start", "case_id": "EC_047", "order_id": "b04477ada8d2ad7fa9d95358baaa785d", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:58", "event": "llm_intent", "case_id": "EC_047", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_047", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "b04477ada8d2ad7fa9d95358baaa785d"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_047", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 27.7, "freight_total_brl": 15.1, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_047", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "b04477ada8d2ad7fa9d95358baaa785d", "item_total_brl": 27.7, "freight_total_brl": 15.1}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_047", "agent": "payment_agent", "payload": {"payment_total_brl": 42.8, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_047", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "b04477ada8d2ad7fa9d95358baaa785d"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_047", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2018-01-06 13:39:08", "order_estimated_delivery_date": "2018-01-26 00:00:00"}}
+{"ts": "2026-08-05T11:01:58", "event": "handoff", "case_id": "EC_047", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:58", "event": "finding", "case_id": "EC_047", "agent": "policy_agent", "payload": {"primary_issue": "unsupported_late_claim", "root_cause_code": "DELIVERY_WITHIN_ESTIMATE", "recommended_refund_brl": 0.0, "action": "reject_late_refund"}}
+{"ts": "2026-08-05T11:01:58", "event": "verify", "case_id": "EC_047", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:58", "event": "case_complete", "case_id": "EC_047", "primary_issue": "unsupported_late_claim", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:58", "event": "case_start", "case_id": "EC_048", "order_id": "adc253f1977c81c2c29dc7b9dd23d538", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:59", "event": "llm_intent", "case_id": "EC_048", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_048", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "adc253f1977c81c2c29dc7b9dd23d538"}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_048", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 43.0, "freight_total_brl": 18.4, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_048", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "adc253f1977c81c2c29dc7b9dd23d538", "item_total_brl": 43.0, "freight_total_brl": 18.4}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_048", "agent": "payment_agent", "payload": {"payment_total_brl": 61.4, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_048", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "adc253f1977c81c2c29dc7b9dd23d538"}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_048", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": false, "order_delivered_customer_date": "2018-07-05 19:41:59", "order_estimated_delivery_date": "2018-07-30 00:00:00"}}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_048", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_048", "agent": "policy_agent", "payload": {"primary_issue": "unsupported_late_claim", "root_cause_code": "DELIVERY_WITHIN_ESTIMATE", "recommended_refund_brl": 0.0, "action": "reject_late_refund"}}
+{"ts": "2026-08-05T11:01:59", "event": "verify", "case_id": "EC_048", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:59", "event": "case_complete", "case_id": "EC_048", "primary_issue": "unsupported_late_claim", "recommended_refund_brl": 0.0}
+{"ts": "2026-08-05T11:01:59", "event": "case_start", "case_id": "EC_049", "order_id": "5b9e9502eca103a28ea22a94c65e3950", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:59", "event": "llm_intent", "case_id": "EC_049", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_049", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "5b9e9502eca103a28ea22a94c65e3950"}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_049", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 29.99, "freight_total_brl": 15.31, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_049", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "5b9e9502eca103a28ea22a94c65e3950", "item_total_brl": 29.99, "freight_total_brl": 15.31}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_049", "agent": "payment_agent", "payload": {"payment_total_brl": 45.3, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_049", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "5b9e9502eca103a28ea22a94c65e3950"}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_049", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2018-08-27 18:55:45", "order_estimated_delivery_date": "2018-08-20 00:00:00"}}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_049", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_049", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_logistics", "root_cause_code": "CARRIER_DELIVERED_AFTER_ESTIMATE", "recommended_refund_brl": 15.31, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:59", "event": "verify", "case_id": "EC_049", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:59", "event": "case_complete", "case_id": "EC_049", "primary_issue": "late_delivery_logistics", "recommended_refund_brl": 15.31}
+{"ts": "2026-08-05T11:01:59", "event": "case_start", "case_id": "EC_050", "order_id": "af0bbb47f125381ce9f3597dc70ef07b", "policy_version": "EC_POLICY_V1"}
+{"ts": "2026-08-05T11:01:59", "event": "llm_intent", "case_id": "EC_050", "agent": "coordinator", "model": "Qwen/Qwen2.5-1.5B-Instruct", "intent": "late_delivery"}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_050", "sender": "coordinator", "recipient": "order_seller_agent", "payload": {"order_id": "af0bbb47f125381ce9f3597dc70ef07b"}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_050", "agent": "order_seller_agent", "payload": {"order_status": "delivered", "item_total_brl": 9.5, "freight_total_brl": 14.1, "late_seller_ids": []}}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_050", "sender": "order_seller_agent", "recipient": "payment_agent", "payload": {"order_id": "af0bbb47f125381ce9f3597dc70ef07b", "item_total_brl": 9.5, "freight_total_brl": 14.1}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_050", "agent": "payment_agent", "payload": {"payment_total_brl": 23.6, "payment_count": 1, "is_split_payment": false, "reconciled": true}}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_050", "sender": "coordinator", "recipient": "delivery_agent", "payload": {"order_id": "af0bbb47f125381ce9f3597dc70ef07b"}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_050", "agent": "delivery_agent", "payload": {"order_found": true, "delivered_late": true, "order_delivered_customer_date": "2018-03-07 19:13:53", "order_estimated_delivery_date": "2018-03-05 00:00:00"}}
+{"ts": "2026-08-05T11:01:59", "event": "handoff", "case_id": "EC_050", "sender": "coordinator", "recipient": "policy_agent", "payload": {"facts": "combined findings"}}
+{"ts": "2026-08-05T11:01:59", "event": "finding", "case_id": "EC_050", "agent": "policy_agent", "payload": {"primary_issue": "late_delivery_logistics", "root_cause_code": "CARRIER_DELIVERED_AFTER_ESTIMATE", "recommended_refund_brl": 14.1, "action": "refund_freight"}}
+{"ts": "2026-08-05T11:01:59", "event": "verify", "case_id": "EC_050", "agent": "verifier_agent", "violations": []}
+{"ts": "2026-08-05T11:01:59", "event": "case_complete", "case_id": "EC_050", "primary_issue": "late_delivery_logistics", "recommended_refund_brl": 14.1}
+{"ts": "2026-08-05T11:01:59", "event": "run_complete", "cases": 50, "seconds": 16.5, "primary_issue_counts": {"late_delivery_seller": 8, "unsupported_late_claim": 9, "canceled_order_paid": 8, "valid_split_payment": 9, "unavailable_order_paid": 8, "late_delivery_logistics": 8}}
