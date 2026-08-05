@@ -1,9 +1,18 @@
 {
-  "model": "Qwen/Qwen3-8B",
-  "parameter_size_billion": 8.2,
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "parameter_size_billion": 1.54,
   "framework": "transformers",
   "runtime": "local",
   "torch_dtype": "auto",
   "device_map": "auto",
-  "thinking_mode": false
+  "thinking_mode": false,
+  "decoding": "greedy",
+  "agents": [
+    "coordinator_agent",
+    "order_seller_agent",
+    "payment_agent",
+    "delivery_agent",
+    "policy_agent",
+    "verifier_agent"
+  ]
 }
