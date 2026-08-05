@@ -4,13 +4,13 @@
 
 ## 1. Thông tin cá nhân
 
-| Thông tin       | Nội dung     |
-| --------------- | ------------ |
-| Họ và tên       | [Họ và tên]  |
-| MSSV            | [MSSV]       |
-| Khóa/Lớp        | [K3]         |
-| Vai trò chính   | [Vai trò]    |
-| Ngày hoàn thành | [YYYY-MM-DD] |
+| Thông tin       | Nội dung        |
+| --------------- | --------------- |
+| Họ và tên       | Cao Quế Phương  |
+| MSSV            | 2A202601111     |
+| Khóa/Lớp        | [K3]            |
+| Vai trò chính   | [Vai trò]       |
+| Ngày hoàn thành | 2026-08-05      |
 
 ## 2. Vai trò và phạm vi công việc
 

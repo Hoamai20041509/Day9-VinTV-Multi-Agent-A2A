@@ -1,0 +1,9 @@
+{
+  "model": "Qwen/Qwen3-8B",
+  "parameter_size_billion": 8.2,
+  "framework": "transformers",
+  "runtime": "local",
+  "torch_dtype": "auto",
+  "device_map": "auto",
+  "thinking_mode": false
+}
