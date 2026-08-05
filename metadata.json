@@ -1,1 +1,19 @@
-{}
+{
+  "model": "Qwen/Qwen3-8B",
+  "parameter_size_billion": 8.2,
+  "framework": "transformers",
+  "runtime": "local",
+  "torch_dtype": "auto",
+  "device_map": "auto",
+  "thinking_mode": false,
+  "agents": [
+    {
+      "agent": "payment_agent",
+      "owner": "TV3",
+      "model": "Qwen/Qwen2.5-1.5B-Instruct",
+      "parameter_size": "1.5B",
+      "framework": "transformers",
+      "runtime": "local"
+    }
+  ]
+}

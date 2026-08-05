@@ -5,7 +5,7 @@
   "runtime": "local",
   "torch_dtype": "auto",
   "device_map": "auto",
-  "thinking_mode": false
+  "thinking_mode": false,
   "agents": [
     {
       "agent": "payment_agent",
