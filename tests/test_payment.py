@@ -1,113 +1,85 @@
-import csv
-import unittest
+"""Tests for the Payment Agent's deterministic reconciliation core.
+
+Ground truth below was cross-checked directly against data/olist_order_payments_dataset.csv
+and data/olist_order_items_dataset.csv for the official EC_001-EC_050 claimed_order_ids
+(item_total_brl/freight_total_brl are what the Order & Seller Agent would hand off).
+No test here loads the LLM - PaymentAgent.analyze() never depends on it.
+"""
+import sys
 from pathlib import Path
-from tempfile import TemporaryDirectory
 
-from agents.payment_agent import PaymentAgent
-from services.payment_repository import PaymentRepository
-from services.policy_engine import evaluate_rule_5_valid_split_payment
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-
-class PaymentAgentTest(unittest.TestCase):
-    def _repo(self, rows):
-        tmp = TemporaryDirectory()
-        self.addCleanup(tmp.cleanup)
-        csv_path = Path(tmp.name) / "payments.csv"
-        with csv_path.open("w", encoding="utf-8", newline="") as file:
-            writer = csv.DictWriter(
-                file,
-                fieldnames=[
-                    "order_id",
-                    "payment_sequential",
-                    "payment_type",
-                    "payment_installments",
-                    "payment_value",
-                ],
-            )
-            writer.writeheader()
-            writer.writerows(rows)
-        return PaymentRepository(csv_path)
-
-    def test_valid_split_payment_reconciles_within_tolerance(self):
-        repo = self._repo(
-            [
-                {
-                    "order_id": "o1",
-                    "payment_sequential": "1",
-                    "payment_type": "credit_card",
-                    "payment_installments": "1",
-                    "payment_value": "40.00",
-                },
-                {
-                    "order_id": "o1",
-                    "payment_sequential": "2",
-                    "payment_type": "voucher",
-                    "payment_installments": "1",
-                    "payment_value": "10.05",
-                },
-            ]
-        )
-
-        result = PaymentAgent(repo).analyze("o1", item_total_brl=45, freight_total_brl=5)
-
-        self.assertEqual(result.payment_total_brl, 50.05)
-        self.assertEqual(result.payment_row_count, 2)
-        self.assertTrue(result.has_split_payment)
-        self.assertTrue(result.reconciled_with_order_total)
-        self.assertTrue(result.valid_split_payment)
-        self.assertEqual(result.payment_ids, ["o1:1", "o1:2"])
-        self.assertEqual(result.evidence_ids, ["payment:o1:1", "payment:o1:2"])
-
-    def test_single_payment_is_not_rule_5(self):
-        repo = self._repo(
-            [
-                {
-                    "order_id": "o2",
-                    "payment_sequential": "1",
-                    "payment_type": "credit_card",
-                    "payment_installments": "1",
-                    "payment_value": "50.00",
-                }
-            ]
-        )
-
-        result = PaymentAgent(repo).analyze("o2", item_total_brl=45, freight_total_brl=5)
-
-        self.assertFalse(result.has_split_payment)
-        self.assertTrue(result.reconciled_with_order_total)
-        self.assertFalse(result.valid_split_payment)
-        self.assertIsNone(evaluate_rule_5_valid_split_payment(result))
-
-    def test_policy_rule_5_decision(self):
-        repo = self._repo(
-            [
-                {
-                    "order_id": "o3",
-                    "payment_sequential": "1",
-                    "payment_type": "voucher",
-                    "payment_installments": "1",
-                    "payment_value": "20.00",
-                },
-                {
-                    "order_id": "o3",
-                    "payment_sequential": "2",
-                    "payment_type": "credit_card",
-                    "payment_installments": "2",
-                    "payment_value": "80.00",
-                },
-            ]
-        )
-
-        result = PaymentAgent(repo).analyze("o3", item_total_brl=90, freight_total_brl=10)
-        decision = evaluate_rule_5_valid_split_payment(result)
-
-        self.assertIsNotNone(decision)
-        self.assertEqual(decision.primary_issue, "valid_split_payment")
-        self.assertEqual(decision.case_status, "no_action")
-        self.assertEqual(decision.recommended_refund_brl, 0.0)
-        self.assertEqual(decision.resolution_actions, ["explain_valid_split_payment"])
-        self.assertIn("policy:MULTIPLE_PAYMENTS_RECONCILED", decision.evidence_ids)
+from agents.payment_agent import MAX_PAYMENT_IDS, compute_reconciliation
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_single_payment_reconciles_ec001():
+    r = compute_reconciliation(
+        "e2a03ccf5ea816036608b2d8c3ab8e60", item_total_brl=119.90, freight_total_brl=12.04
+    )
+    assert r.payment_total_brl == 131.94
+    assert r.payment_count == 1
+    assert r.is_split_payment is False
+    assert r.reconciled is True
+    assert r.payment_ids == ["payment:e2a03ccf5ea816036608b2d8c3ab8e60:1"]
+
+
+def test_two_way_split_payment_reconciles_ec004():
+    r = compute_reconciliation(
+        "fd28a6dfe413804d0b89b7c9abf5b1f3", item_total_brl=179.90, freight_total_brl=32.06
+    )
+    assert r.payment_total_brl == 211.96
+    assert r.payment_count == 2
+    assert r.is_split_payment is True
+    assert r.reconciled is True
+
+
+def test_three_way_split_payment_reconciles_ec030():
+    r = compute_reconciliation(
+        "405be8487a7fde1db0bc31ad6b08050a", item_total_brl=15.90, freight_total_brl=9.94
+    )
+    assert r.payment_total_brl == 25.84
+    assert r.payment_count == 3
+    assert r.is_split_payment is True
+    assert r.reconciled is True
+
+
+def test_unavailable_order_no_items_reports_raw_totals_ec005():
+    # No item rows -> TV2 hands off 0.0/0.0. Payment Agent reports the numbers
+    # honestly (reconciled=False against 0); the Coordinator/Policy Agent, not
+    # this agent, decides unavailable_order_paid overrides the split-payment rule.
+    r = compute_reconciliation(
+        "9a31fd9d697e9670777501f720773fd9", item_total_brl=0.0, freight_total_brl=0.0
+    )
+    assert r.payment_total_brl == 1191.50
+    assert r.payment_count == 1
+    assert r.is_split_payment is False
+    assert r.reconciled is False
+    assert r.payment_ids == ["payment:9a31fd9d697e9670777501f720773fd9:1"]
+
+
+def test_canceled_order_paid_totals_ec003():
+    r = compute_reconciliation(
+        "71303d7e93b399f5bcd537d124c0bcfa", item_total_brl=100.0, freight_total_brl=9.34
+    )
+    assert r.payment_total_brl == 109.34
+    assert r.payment_count == 1
+
+
+def test_missing_order_returns_zeroed_result():
+    r = compute_reconciliation("does-not-exist", item_total_brl=10.0, freight_total_brl=1.0)
+    assert r.payment_total_brl == 0.0
+    assert r.payment_count == 0
+    assert r.is_split_payment is False
+    assert r.payment_ids == []
+
+
+def test_payment_ids_capped_at_five_but_total_sums_all_rows():
+    # Real order with 29 payment rows (outside the official 50, used only to
+    # exercise the cap): total must include all 29, payment_ids only the first 5.
+    order_id = "fa65dad1b0e818e3ccc5cb0e39231352"
+    r = compute_reconciliation(order_id, item_total_brl=0.0, freight_total_brl=457.99)
+    assert r.payment_count == 29
+    assert r.payment_total_brl == 457.99
+    assert len(r.payment_ids) == MAX_PAYMENT_IDS
+    assert r.payment_ids == [f"payment:{order_id}:{i}" for i in range(1, 6)]

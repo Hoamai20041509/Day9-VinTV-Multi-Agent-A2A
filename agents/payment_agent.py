@@ -1,65 +1,93 @@
-from decimal import Decimal
+"""Payment Agent (TV3) - reconciles order_payments against item + freight totals.
 
-from services.payment_repository import PaymentRepository, money_to_decimal, money_to_float
-from shared.constants import MAX_ENTITY_IDS, MONEY_TOLERANCE_BRL
-from shared.schemas import PaymentAnalysis
+Handoff contract:
+- Receives `item_total_brl` / `freight_total_brl` from the Order & Seller Agent
+  (already 0.0/0.0 when the order has no item rows) - this agent never reads
+  order_items.csv itself.
+- Never infers a refund ledger or transaction ID; Olist has none.
+
+All money math is deterministic Python (`compute_reconciliation`), not model
+output, so the model can never corrupt the scored financial_resolution
+numbers. The LLM (Qwen2.5-1.5B-Instruct) is only used for an optional
+natural-language note for the trace log.
+"""
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from services import payment_repository
+
+MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"
+RECONCILIATION_TOLERANCE_BRL = 0.10
+MAX_PAYMENT_IDS = 5
 
 
-AGENT_NAME = "payment_agent"
+@dataclass
+class PaymentReconciliation:
+    payment_total_brl: float
+    payment_count: int
+    is_split_payment: bool
+    reconciled: bool
+    payment_ids: list[str]
+
+
+def compute_reconciliation(
+    order_id: str, item_total_brl: float, freight_total_brl: float
+) -> PaymentReconciliation:
+    """Sums ALL payment rows (the 5-ID cap below only trims the evidence list,
+    never the total), then checks it against item_total + freight_total
+    within the 0.10 BRL tolerance from EC_POLICY_V1."""
+    rows = payment_repository.get_payments(order_id)
+    payment_total_brl = round(sum(r["payment_value"] for r in rows), 2)
+    expected_total = round(item_total_brl + freight_total_brl, 2)
+    diff = round(abs(payment_total_brl - expected_total), 2)
+    payment_ids = [f"payment:{order_id}:{r['payment_sequential']}" for r in rows[:MAX_PAYMENT_IDS]]
+    return PaymentReconciliation(
+        payment_total_brl=payment_total_brl,
+        payment_count=len(rows),
+        is_split_payment=len(rows) >= 2,
+        reconciled=diff <= RECONCILIATION_TOLERANCE_BRL,
+        payment_ids=payment_ids,
+    )
 
 
 class PaymentAgent:
-    """Owns rule-5 payment facts; does not infer refunds or transaction IDs."""
+    """Thin LLM wrapper around `compute_reconciliation`. The model narrates the
+    already-computed numbers; it never recomputes them."""
 
-    def __init__(self, repository: PaymentRepository | None = None) -> None:
-        self.repository = repository or PaymentRepository()
+    def __init__(self, model_name: str = MODEL_NAME):
+        self.model_name = model_name
+        self._pipeline = None
 
-    def analyze(
-        self,
-        order_id: str,
-        item_total_brl: float | int | str | Decimal | None = None,
-        freight_total_brl: float | int | str | Decimal | None = None,
-    ) -> PaymentAnalysis:
-        rows = self.repository.get_by_order_id(order_id)
-        payment_total = sum((money_to_decimal(row.payment_value_brl) for row in rows), Decimal("0.00"))
-        payment_total = money_to_decimal(payment_total)
+    def _load_model(self):
+        from transformers import pipeline
 
-        expected_total: Decimal | None = None
-        reconciled = False
-        delta = Decimal("0.00")
-        notes: list[str] = []
+        self._pipeline = pipeline("text-generation", model=self.model_name, tokenizer=self.model_name)
 
-        if item_total_brl is None or freight_total_brl is None:
-            notes.append("item_total_brl/freight_total_brl not provided; reconciliation deferred")
-        else:
-            expected_total = money_to_decimal(item_total_brl) + money_to_decimal(freight_total_brl)
-            expected_total = money_to_decimal(expected_total)
-            delta = abs(payment_total - expected_total)
-            reconciled = delta <= MONEY_TOLERANCE_BRL
+    def analyze(self, order_id: str, item_total_brl: float, freight_total_brl: float) -> dict:
+        result = compute_reconciliation(order_id, item_total_brl, freight_total_brl)
+        return {
+            "financial_resolution": {
+                "item_total_brl": round(item_total_brl, 2),
+                "freight_total_brl": round(freight_total_brl, 2),
+                "payment_total_brl": result.payment_total_brl,
+            },
+            "payment_ids": result.payment_ids,
+            "is_split_payment": result.is_split_payment,
+            "reconciled": result.reconciled,
+        }
 
-        has_split_payment = len(rows) >= 2
-        valid_split_payment = has_split_payment and reconciled
-
-        return PaymentAnalysis(
-            agent_name=AGENT_NAME,
-            order_id=order_id,
-            payment_rows=rows,
-            payment_total_brl=money_to_float(payment_total),
-            payment_row_count=len(rows),
-            payment_ids=[row.entity_id for row in rows[:MAX_ENTITY_IDS]],
-            evidence_ids=[row.evidence_id for row in rows[:MAX_ENTITY_IDS]],
-            has_split_payment=has_split_payment,
-            reconciled_with_order_total=reconciled,
-            reconciliation_delta_brl=money_to_float(delta),
-            valid_split_payment=valid_split_payment,
-            expected_order_total_brl=money_to_float(expected_total) if expected_total is not None else None,
-            notes=notes,
+    def explain(self, order_id: str, item_total_brl: float, freight_total_brl: float) -> str:
+        """Optional one-line Vietnamese note for trace.jsonl - not used for scoring."""
+        result = compute_reconciliation(order_id, item_total_brl, freight_total_brl)
+        if self._pipeline is None:
+            self._load_model()
+        expected_total = round(item_total_brl + freight_total_brl, 2)
+        prompt = (
+            f"Đơn hàng {order_id}: tổng thanh toán {result.payment_total_brl} BRL, "
+            f"tổng item+freight {expected_total} BRL, {result.payment_count} dòng thanh toán. "
+            "Viết một câu tiếng Việt ngắn gọn nêu payment có đối soát khớp hay không."
         )
-
-
-def analyze_payment(
-    order_id: str,
-    item_total_brl: float | int | str | Decimal | None = None,
-    freight_total_brl: float | int | str | Decimal | None = None,
-) -> dict:
-    return PaymentAgent().analyze(order_id, item_total_brl, freight_total_brl).to_handoff()
+        messages = [{"role": "user", "content": prompt}]
+        output = self._pipeline(messages, max_new_tokens=60, do_sample=False)
+        return output[0]["generated_text"][-1]["content"].strip()
