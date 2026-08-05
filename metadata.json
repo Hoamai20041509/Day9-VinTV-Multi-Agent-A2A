@@ -1,1 +1,26 @@
-{}
+{
+  "cohort": "K3",
+  "repo_starter": "Day9-VinTV-Multi-Agent-A2A",
+  "policy_version": "EC_POLICY_V1",
+  "model": "Qwen/Qwen2.5-1.5B-Instruct",
+  "parameter_size_billion": 1.54,
+  "framework": "transformers",
+  "runtime": "local",
+  "torch_dtype": "auto",
+  "device_map": "auto",
+  "thinking_mode": false,
+  "decoding": "greedy",
+  "tools_used": [
+    "local_filesystem",
+    "python",
+    "pytest"
+  ],
+  "agents": [
+    "coordinator_agent",
+    "order_seller_agent",
+    "payment_agent",
+    "delivery_agent",
+    "policy_agent",
+    "verifier_agent"
+  ]
+}
