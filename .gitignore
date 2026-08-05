@@ -29,5 +29,4 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Submission artifact (uploaded separately, not committed)
-output.zip
+
